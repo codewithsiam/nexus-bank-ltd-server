@@ -7,7 +7,7 @@ const port = process.env.PORT || 3500;
 app.use(cors());
 app.use(express.json());
 
-// import 
+// import nice 
 const userRoutes = require('./routes/user')
 
 app.get("/",(req,res)=>{
