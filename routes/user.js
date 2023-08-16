@@ -16,5 +16,4 @@ router.get("/addUser",(req,res)=>{
 //   });
 
 
-
 module.exports = router;
