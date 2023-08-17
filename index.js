@@ -32,11 +32,25 @@ async function run() {
     // await client.connect();
 
     const employeeCollection = client.db("nexusBankDB").collection("employees")
+    const loanCollection = client.db("nexusBankDB").collection("loans")
 
     app.get('/employees', async(req,res)=>{
       const result = await employeeCollection.find().toArray();
       res.send(result)
   })
+
+// add all loan request that creates the user : by default it is pending
+app.post('/apply-loan', async (req, res) => {
+  try {
+      const data = req.body;
+      const result = await loanCollection.insertOne(data);
+      res.status(200).json(result);
+  } catch (error) {
+      console.error('Error submitting loan application:', error);
+      res.status(500).json({ message: 'Loan application submission failed' });
+  }
+});
+
 
     // app.use(userRoutes)
     // Send a ping to confirm a successful connection
