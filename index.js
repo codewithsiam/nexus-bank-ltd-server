@@ -10,6 +10,7 @@ app.use(express.json());
 
 // import nice 
 const userRoutes = require('./routes/user')
+const employeeRoutes = require("./routes/employee")
 
 
 
@@ -25,11 +26,15 @@ const client = new MongoClient(uri, {
   }
 });
 
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
+    const employeeCollection = client.db("nexusBankDB").collection("employees");
+
+    app.use(employeeRoutes)
     app.use(userRoutes)
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -50,3 +55,8 @@ app.get("/",(req,res)=>{
 app.listen(port,()=>{
     console.log(`Nexus bank is running now in port:${port}`)
 })
+
+
+module.exports = {
+  employeeCollection
+}
