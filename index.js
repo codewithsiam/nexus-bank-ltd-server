@@ -3,13 +3,13 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
 require("dotenv").config();
 const app = express();
-const port = process.env.PORT || 3500;
+const port = process.env.PORT || 5000;
 // middleware
 app.use(cors());
 app.use(express.json());
 
 // import nice 
-const userRoutes = require('./routes/user')
+// const userRoutes = require('./routes/user')
 
 
 
@@ -25,12 +25,34 @@ const client = new MongoClient(uri, {
   }
 });
 
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    app.use(userRoutes)
+    const employeeCollection = client.db("nexusBankDB").collection("employees")
+    const loanCollection = client.db("nexusBankDB").collection("loans")
+
+    app.get('/employees', async(req,res)=>{
+      const result = await employeeCollection.find().toArray();
+      res.send(result)
+  })
+
+// add all loan request that creates the user : by default it is pending
+app.post('/apply-loan', async (req, res) => {
+  try {
+      const data = req.body;
+      const result = await loanCollection.insertOne(data);
+      res.status(200).json(result);
+  } catch (error) {
+      console.error('Error submitting loan application:', error);
+      res.status(500).json({ message: 'Loan application submission failed' });
+  }
+});
+
+
+    // app.use(userRoutes)
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -41,6 +63,20 @@ async function run() {
 }
 run().catch(console.dir);
 
+// start---------
+
+// // Export MongoDB connection and employee collection
+// exports.mongoClient = client;
+// exports.employeeCollection = client.db("nexusBankDB").collection("employees");
+
+// // Routes
+// const userRoutes = require('./routes/user');
+// const employeeRoutes = require('./routes/employee');
+
+// app.use(employeeRoutes);
+// app.use(userRoutes);
+
+// end ------------
 
 app.get("/",(req,res)=>{
     res.send("Nexus Bank in Running")
@@ -50,3 +86,4 @@ app.get("/",(req,res)=>{
 app.listen(port,()=>{
     console.log(`Nexus bank is running now in port:${port}`)
 })
+
