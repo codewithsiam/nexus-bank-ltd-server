@@ -4,6 +4,7 @@ const cors = require('cors');
 require("dotenv").config();
 const app = express();
 var morgan = require('morgan')
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 
@@ -36,6 +37,7 @@ async function run() {
         const usersCollection = client.db("nexusBankDB").collection("users")
         const employeeCollection = client.db("nexusBankDB").collection("employees")
         const loanCollection = client.db("nexusBankDB").collection("loans")
+        const paymentCollection = client.db("nexusBankDB").collection("transactions")
 
         app.get('/employees', async (req, res) => {
             const result = await employeeCollection.find().toArray();
@@ -55,7 +57,7 @@ async function run() {
         });
 
         // users
-        app.get("/addUser", async (req,res)=>{
+        app.get("/addUser", async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
@@ -64,11 +66,60 @@ async function run() {
             const query = { email: user.email };
             const existingUser = await usersCollection.findOne(query);
             if (existingUser) {
-              return res.send({ message: "user already exits" });
+                return res.send({ message: "user already exits" });
             }
             const result = await usersCollection.insertOne(user);
             res.send(result);
-          });
+        });
+
+        // payment methods stripe----------------------------------------------------------------
+        app.post("/create-payment-intent", async (req, res) => {
+            try {
+                // console.log("hit success");
+                const { amount } = req.body;
+                const amountConvert = parseInt(amount * 100); // convert needed for stripe
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: amountConvert,
+                    currency: "usd",
+                    payment_method_types: ["card"],
+                });
+
+                res.send({
+                    clientSecret: paymentIntent.client_secret,
+                });
+            } catch (error) {
+                console.error("Error creating payment intent:", error);
+                res.status(500).send("An error occurred while creating the payment intent");
+            }
+        });
+
+
+        app.post("/payments", async (req, res) => {
+            try {
+                //   console.log("hit success");
+                const payment = req.body;
+                // Find user and update balance
+                const user = await usersCollection.findOne({ email: payment.userEmail });
+                if (user) {
+                    if (!user.balance) {
+                        user.balance = 0;
+                    }
+                    user.balance += payment.amount;
+                    await usersCollection.updateOne({ email: payment.userEmail }, { $set: user });
+                } else {
+                    console.log("User not found");
+                }
+
+                // Save payment transaction to the database
+                const postResult = await paymentCollection.insertOne(payment);
+                res.send(postResult);
+            } catch (error) {
+                console.error("Error processing payment:", error);
+                res.status(500).send("An error occurred while processing the payment");
+            }
+        });
+
+
 
 
         // app.use(userRoutes)
