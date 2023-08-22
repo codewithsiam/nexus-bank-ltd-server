@@ -3,8 +3,8 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-var morgan = require('morgan')
-const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
+var morgan = require("morgan");
+
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -31,8 +31,6 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-
-
     // app.use(userRoutes)
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -51,93 +49,23 @@ run().catch(console.dir);
 // Export MongoDB connection and employee collection
 exports.mongoClient = client;
 exports.employeeCollection = client.db("nexusBankDB").collection("employees");
+exports.usersCollection = client.db("nexusBankDB").collection("users");
+exports.loanCollection = client.db("nexusBankDB").collection("loans");
+exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 
-// Routes
-const userRoutes = require("./routes/user");
+
+// Routes-------------------
 const employeeRoutes = require("./routes/employee");
+const userRoutes = require("./routes/user");
+const paymentRoutes = require("./routes/payments");
 
-//
-const usersCollection = client.db("nexusBankDB").collection("users")
-const employeeCollection = client.db("nexusBankDB").collection("employees")
-const loanCollection = client.db("nexusBankDB").collection("loans")
-const paymentCollection = client.db("nexusBankDB").collection("transactions")
-
-// use middleware----------------
+// use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
+app.use(paymentRoutes);
 
 
-
-
-app.get("/employees", async (req, res) => {
-const result = await employeeCollection.find().toArray();
-res.send(result);
-});
-
-// add all loan request that creates the user : by default it is pending
-app.post("/apply-loan", async (req, res) => {
-try {
-const data = req.body;
-const result = await loanCollection.insertOne(data);
-res.status(200).json(result);
-} catch (error) {
-console.error("Error submitting loan application:", error);
-res.status(500).json({ message: "Loan application submission failed" });
-}
-});
-
-
-
-// payment methods stripe----------------------------------------------------------------
-app.post("/create-payment-intent", async (req, res) => {
-    try {
-        // console.log("hit success");
-        const { amount } = req.body;
-        const amountConvert = parseInt(amount * 100); // convert needed for stripe
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountConvert,
-            currency: "usd",
-            payment_method_types: ["card"],
-        });
-
-        res.send({
-            clientSecret: paymentIntent.client_secret,
-        });
-    } catch (error) {
-        console.error("Error creating payment intent:", error);
-        res.status(500).send("An error occurred while creating the payment intent");
-    }
-});
-
-
-app.post("/payments", async (req, res) => {
-    try {
-        //   console.log("hit success");
-        const payment = req.body;
-        // Find user and update balance
-        const user = await usersCollection.findOne({ email: payment.userEmail });
-        if (user) {
-            if (!user.balance) {
-                user.balance = 0;
-            }
-            user.balance += payment.amount;
-            await usersCollection.updateOne({ email: payment.userEmail }, { $set: user });
-        } else {
-            console.log("User not found");
-        }
-
-        // Save payment transaction to the database
-        const postResult = await paymentCollection.insertOne(payment);
-        res.send(postResult);
-    } catch (error) {
-        console.error("Error processing payment:", error);
-        res.status(500).send("An error occurred while processing the payment");
-    }
-});
-
-
-// end ------------
-
+//
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
 });

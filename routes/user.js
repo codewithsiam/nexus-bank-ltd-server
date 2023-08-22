@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { mongoClient, usersCollection } = require('../index');
+const { mongoClient, usersCollection } = require("../index");
 
 // router.get("/addUser",(req,res)=>{
 //     res.send("User Added Successfully")
@@ -17,20 +17,19 @@ const { mongoClient, usersCollection } = require('../index');
 //   });
 
 // users
-router.get("/addUser", async (req, res) => {
+router.get("/users", async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
-})
-router.post("/users", async (req, res) => {
+});
+router.post("/addUser", async (req, res) => {
   const user = req.body;
   const query = { email: user.email };
   const existingUser = await usersCollection.findOne(query);
   if (existingUser) {
-      return res.send({ message: "user already exits" });
+    return res.send({ message: "user already exits" });
   }
   const result = await usersCollection.insertOne(user);
   res.send(result);
 });
-
 
 module.exports = router;
