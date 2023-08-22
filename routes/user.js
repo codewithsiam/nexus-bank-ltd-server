@@ -15,6 +15,7 @@ const { mongoClient, usersCollection } = require('../index');
 //     const result = await userCollection.insertOne(user);
 //     res.send(result);
 //   });
+
 // users
 router.get("/addUser", async (req, res) => {
   const result = await usersCollection.find().toArray();
