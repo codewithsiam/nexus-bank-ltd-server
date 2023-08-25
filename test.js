@@ -3,13 +3,9 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-var morgan = require("morgan");
-
-const port = process.env.PORT || 5000;
-
+const port = process.env.PORT || 5500;
 // middleware
 app.use(cors());
-app.use(morgan("dev"));
 app.use(express.json());
 
 // import nice
@@ -31,6 +27,13 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
+    // const employeeCollection = client.db("nexusBankDB").collection("employees");
+
+    // app.get("/employees", async (req, res) => {
+    //   const result = await employeeCollection.find().toArray();
+    //   res.send(result);
+    // });
+
     // app.use(userRoutes)
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -49,23 +52,17 @@ run().catch(console.dir);
 // Export MongoDB connection and employee collection
 exports.mongoClient = client;
 exports.employeeCollection = client.db("nexusBankDB").collection("employees");
-exports.usersCollection = client.db("nexusBankDB").collection("users");
-exports.loanCollection = client.db("nexusBankDB").collection("loans");
-exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 
+// Routes
+const userRoutes = require('./routes/user');
+const employeeRoutes = require('./routes/employee');
 
-// Routes-------------------
-const employeeRoutes = require("./routes/employee");
-const userRoutes = require("./routes/user");
-const paymentRoutes = require("./routes/payments");
-
-// use middleware-------------------------
+// use middleware----------------
 app.use(employeeRoutes);
 app.use(userRoutes);
-app.use(paymentRoutes);
 
+// end ------------
 
-//
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
 });
