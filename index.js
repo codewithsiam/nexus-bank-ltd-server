@@ -58,11 +58,13 @@ exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 const employeeRoutes = require("./routes/employee");
 const userRoutes = require("./routes/user");
 const paymentRoutes = require("./routes/payments");
+const authCheckRoutes = require("./routes/authCheck");
 
 // use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
+app.use(authCheckRoutes);
 
 
 //
