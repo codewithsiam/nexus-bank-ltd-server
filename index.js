@@ -44,6 +44,7 @@ async function run() {
 }
 run().catch(console.dir);
 
+
 // start---------
 
 // Export MongoDB connection and employee collection
@@ -52,6 +53,7 @@ exports.employeeCollection = client.db("nexusBankDB").collection("employees");
 exports.usersCollection = client.db("nexusBankDB").collection("users");
 exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
+exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
 
 
 // Routes-------------------
@@ -59,12 +61,14 @@ const employeeRoutes = require("./routes/employee");
 const userRoutes = require("./routes/user");
 const paymentRoutes = require("./routes/payments");
 const authCheckRoutes = require("./routes/authCheck");
+const userAccounts = require("./routes/userAccounts")
 
 // use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
 app.use(authCheckRoutes);
+app.use(userAccounts)
 
 
 //
