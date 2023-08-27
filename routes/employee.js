@@ -39,4 +39,15 @@ router.get("/employeess/:filterItem",async(req,res)=>{
   res.send(result)
 })
 
+router.post("/add-employee", async(req,res)=>{
+  const employee = req.body;
+  const query = {primaryEmail:employee.primaryEmail}
+  const existingEmployee = await employeeCollection.findOne(query);
+  if(existingEmployee){
+    return res.send({ message: "employee already exits" });
+  }
+  const result = await employeeCollection.insertOne(employee);
+  res.send(result)
+})
+
 module.exports = router;
