@@ -60,13 +60,16 @@ exports.userAccountCollection = client.db("nexusBankDB").collection("userAccount
 const employeeRoutes = require("./routes/employee");
 const userRoutes = require("./routes/user");
 const paymentRoutes = require("./routes/payments");
+const authCheckRoutes = require("./routes/authCheck");
 const userAccounts = require("./routes/userAccounts")
+const loanRoutes = require("./routes/loan")
 
 // use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
-app.use(userAccounts)
+app.use(authCheckRoutes);
+app.use(loanRoutes)
 
 
 //

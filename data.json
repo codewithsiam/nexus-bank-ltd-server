@@ -1,1 +1,90 @@
-[{"_id":"64ddaaff4e56edf37c0be2e8","name":"John Doe","image":"https://i.ibb.co/MhFM3L3/images-2.jpg","designation":"Senior Manager","social":{"facebook":"https://facebook.com/johndoe","twitter":"https://twitter.com/johndoe","instagram":"https://instagram.com/johndoe"}},{"_id":"64ddaaff4e56edf37c0be2e9","name":"Jane Smith","image":"https://i.ibb.co/ckdpscW/images-1.jpg","designation":"Financial Analyst","social":{"facebook":"https://facebook.com/janesmith","twitter":"https://twitter.com/janesmith","instagram":"https://instagram.com/janesmith"}},{"_id":"64ddaaff4e56edf37c0be2ea","name":"Michael Johnson","image":"https://i.ibb.co/Hr5sgCq/images.jpg","designation":"Customer Service Representative","social":{"facebook":"https://facebook.com/michaeljohnson","twitter":"https://twitter.com/michaeljohnson","instagram":"https://instagram.com/michaeljohnson"}},{"_id":"64ddaaff4e56edf37c0be2eb","name":"Emily Williams","image":"https://i.ibb.co/hZ219gy/john-doe.jpg","designation":"Branch Manager","social":{"facebook":"https://facebook.com/emilywilliams","twitter":"https://twitter.com/emilywilliams","instagram":"https://instagram.com/emilywilliams"}},{"_id":"64ddaaff4e56edf37c0be2ec","name":"Robert Brown","image":"https://example.com/images/robert_brown.jpg","designation":"Loan Officer","social":{"facebook":"https://facebook.com/robertbrown","twitter":"https://twitter.com/robertbrown","instagram":"https://instagram.com/robertbrown"}},{"_id":"64ddaaff4e56edf37c0be2ed","name":"Sophia Miller","image":"https://example.com/images/sophia_miller.jpg","designation":"Marketing Specialist","social":{"facebook":"https://facebook.com/sophiamiller","twitter":"https://twitter.com/sophiamiller","instagram":"https://instagram.com/sophiamiller"}},{"_id":"64ddaaff4e56edf37c0be2ee","name":"William Davis","image":"https://example.com/images/william_davis.jpg","designation":"IT Manager","social":{"facebook":"https://facebook.com/williamdavis","twitter":"https://twitter.com/williamdavis","instagram":"https://instagram.com/williamdavis"}},{"_id":"64ddaaff4e56edf37c0be2ef","name":"Olivia Wilson","image":"https://example.com/images/olivia_wilson.jpg","designation":"HR Coordinator","social":{"facebook":"https://facebook.com/oliviawilson","twitter":"https://twitter.com/oliviawilson","instagram":"https://instagram.com/oliviawilson"}}]
+[
+  {
+    "_id": "64ddaaff4e56edf37c0be2e8",
+    "name": "John Doe",
+    "image": "https://i.ibb.co/MhFM3L3/images-2.jpg",
+    "designation": "Senior Manager",
+    "social": {
+      "facebook": "https://facebook.com/johndoe",
+      "twitter": "https://twitter.com/johndoe",
+      "instagram": "https://instagram.com/johndoe"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2e9",
+    "name": "Jane Smith",
+    "image": "https://i.ibb.co/ckdpscW/images-1.jpg",
+    "designation": "Financial Analyst",
+    "social": {
+      "facebook": "https://facebook.com/janesmith",
+      "twitter": "https://twitter.com/janesmith",
+      "instagram": "https://instagram.com/janesmith"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2ea",
+    "name": "Michael Johnson",
+    "image": "https://i.ibb.co/Hr5sgCq/images.jpg",
+    "designation": "Customer Service Representative",
+    "social": {
+      "facebook": "https://facebook.com/michaeljohnson",
+      "twitter": "https://twitter.com/michaeljohnson",
+      "instagram": "https://instagram.com/michaeljohnson"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2eb",
+    "name": "Emily Williams",
+    "image": "https://i.ibb.co/hZ219gy/john-doe.jpg",
+    "designation": "Branch Manager",
+    "social": {
+      "facebook": "https://facebook.com/emilywilliams",
+      "twitter": "https://twitter.com/emilywilliams",
+      "instagram": "https://instagram.com/emilywilliams"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2ec",
+    "name": "Robert Brown",
+    "image": "https://example.com/images/robert_brown.jpg",
+    "designation": "Loan Officer",
+    "social": {
+      "facebook": "https://facebook.com/robertbrown",
+      "twitter": "https://twitter.com/robertbrown",
+      "instagram": "https://instagram.com/robertbrown"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2ed",
+    "name": "Sophia Miller",
+    "image": "https://example.com/images/sophia_miller.jpg",
+    "designation": "Marketing Specialist",
+    "social": {
+      "facebook": "https://facebook.com/sophiamiller",
+      "twitter": "https://twitter.com/sophiamiller",
+      "instagram": "https://instagram.com/sophiamiller"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2ee",
+    "name": "William Davis",
+    "image": "https://example.com/images/william_davis.jpg",
+    "designation": "IT Manager",
+    "social": {
+      "facebook": "https://facebook.com/williamdavis",
+      "twitter": "https://twitter.com/williamdavis",
+      "instagram": "https://instagram.com/williamdavis"
+    }
+  },
+  {
+    "_id": "64ddaaff4e56edf37c0be2ef",
+    "name": "Olivia Wilson",
+    "image": "https://example.com/images/olivia_wilson.jpg",
+    "designation": "HR Coordinator",
+    "social": {
+      "facebook": "https://facebook.com/oliviawilson",
+      "twitter": "https://twitter.com/oliviawilson",
+      "instagram": "https://instagram.com/oliviawilson"
+    }
+  }
+]
