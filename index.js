@@ -63,13 +63,16 @@ const paymentRoutes = require("./routes/payments");
 const authCheckRoutes = require("./routes/authCheck");
 const userAccounts = require("./routes/userAccounts")
 const loanRoutes = require("./routes/loan")
+const moneyTransfer = require("./routes/moneyTransfer")
 
 // use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
 app.use(authCheckRoutes);
-app.use(loanRoutes)
+app.use(loanRoutes);
+app.use(moneyTransfer);
+app.use(userAccounts);
 
 
 //
