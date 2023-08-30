@@ -15,6 +15,13 @@ router.get("/requested-accounts",async(req,res)=>{
   const query = {status:"pending"}
   const result = await userAccountCollection.find(query).toArray();
   res.send(result)
+});
+
+// get all approved accounts --------
+router.get("/approved-accounts", async(req,res)=>{
+  const query = {status:"approved"};
+  const result = await userAccountCollection.find(query).toArray();
+  res.send(result);
 })
 
 // Function to generate a unique 10-digit account number
