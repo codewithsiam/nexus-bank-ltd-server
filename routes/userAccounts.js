@@ -32,16 +32,35 @@ async function generateUniqueAccountNumber() {
 }
 
 // handle status 
-router.patch("/status/:id",async (req, res) => {
+router.patch("/status/:id", async (req, res) => {
   const id = req.params.id;
   const status = req.query.status;
-  const accountNumber = await generateUniqueAccountNumber();
-  // console.log(status)
+  let updateDoc = {
+    $set: {
+      status: status,
+    },
+  };
+
+  if (status === "approved") {
+    const accountNumber = await generateUniqueAccountNumber();
+    updateDoc.$set.account_number = accountNumber;
+  }
+
+  const query = { _id: new ObjectId(id) };
+
+  const result = await userAccountCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
+// handle feedback ---------
+router.put("/feedback/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  const { feedback } = req.body;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
     $set: {
-      status: status,
-      account_number:accountNumber
+      feedback: feedback,
     },
   };
 
