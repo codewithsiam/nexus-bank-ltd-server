@@ -24,7 +24,7 @@ router.post("/create-payment-intent", async (req, res) => {
     }
 });
 
-
+// store transaction on the database 
 router.post("/payments", async (req, res) => {
     try {
         //   console.log("hit success");
