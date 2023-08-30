@@ -17,6 +17,47 @@ router.get("/requested-accounts",async(req,res)=>{
   res.send(result)
 });
 
+// search by name , email in pending account
+router.get("/pending-account/:searchItem", async (req, res) => {
+  const searchItem = req.params.searchItem;
+  if (!searchItem) {
+    return res.status(400).json({ error: "name parameter is required" });
+  }
+
+  const query = {
+    $and: [
+      {
+        $or: [
+          { firstName: { $regex: searchItem, $options: "i" }},
+          { lastName: { $regex: searchItem, $options: "i" }},
+          { email: { $regex: searchItem, $options: "i" }}
+        ],
+      },
+      { status: "pending" } // Add the condition for pending accounts
+    ]
+  };
+
+  try {
+    const result = await userAccountCollection.find(query).toArray();
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching pending accounts:", error);
+    res.status(500).json({ error: "An error occurred while fetching pending accounts" });
+  }
+});
+
+// pending account filter ------------
+router.get("/pending/:filterItem",async(req,res)=>{
+  const accountType = req.params.filterItem;
+  if(!accountType){
+    return res.status(400).json({error:"account type is required"})
+  }
+  const query = {account_type:accountType};
+  const result = await userAccountCollection.find(query).toArray();
+  res.send(result)
+})
+
+
 // get all approved accounts --------
 router.get("/approved-accounts", async(req,res)=>{
   const query = {status:"approved"};
@@ -74,6 +115,9 @@ router.put("/feedback/:id", async (req, res) => {
   const result = await userAccountCollection.updateOne(query, updateDoc);
   res.send(result);
 });
+
+
+
 
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;
