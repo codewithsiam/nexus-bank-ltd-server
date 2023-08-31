@@ -15,14 +15,18 @@ router.get("/employees", async (req, res) => {
   }
 });
 
-// employee search
+// employee search-------------
 router.get("/employees/:searchItem", async (req, res) => {
   const searchItem = req.params.searchItem;
   if (!searchItem) {
     return res.status(400).json({ error: "name parameter is required" });
   }
   const query = {
-    $or: [{ name: { $regex: searchItem, $options: "i" } }],
+    $or: [
+      { firstName: { $regex: searchItem, $options: "i" }},
+      { lastName: { $regex: searchItem, $options: "i" }},
+      { primaryEmail: { $regex: searchItem, $options: "i" }}
+    ],
   };
   const result = await employeeCollection.find(query).toArray();
   res.send(result);
