@@ -5,6 +5,24 @@ require("dotenv").config();
 const app = express();
 var morgan = require("morgan");
 
+
+// socket io connect start
+const http=require('http')
+
+const {Server}=require('socket.io')
+
+const server=http.createServer(app)
+exports.io= new Server(server , {
+  cors:{
+      origin:"*"
+  }
+})
+
+
+// socket io connectEnd
+
+
+
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -15,7 +33,7 @@ app.use(express.json());
 // import nice
 // const userRoutes = require('./routes/user')
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.13jglcb.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://nexusUser:lnH874OdCzf23YTu@cluster0.13jglcb.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -60,6 +78,8 @@ exports.userAccountCollection = client.db("nexusBankDB").collection("userAccount
 const employeeRoutes = require("./routes/employee");
 const userRoutes = require("./routes/user");
 const paymentRoutes = require("./routes/payments");
+const router = require("./routes/chat");
+const { connect } = require("http2");
 const authCheckRoutes = require("./routes/authCheck");
 const userAccounts = require("./routes/userAccounts")
 const loanRoutes = require("./routes/loan")
@@ -69,17 +89,19 @@ const moneyTransfer = require("./routes/moneyTransfer")
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
+app.use(router);
 app.use(authCheckRoutes);
 app.use(loanRoutes);
 app.use(moneyTransfer);
 app.use(userAccounts);
 
-
-//
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
 });
 
-app.listen(port, () => {
+
+
+
+server.listen(port, () => {
   console.log(`Nexus bank is running now in port:${port}`);
 });
