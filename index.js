@@ -5,6 +5,24 @@ require("dotenv").config();
 const app = express();
 var morgan = require("morgan");
 
+
+// socket io connect
+const http=require('http')
+
+const {Server}=require('socket.io')
+
+const server=http.createServer(app)
+exports.io= new Server(server , {
+  cors:{
+      origin:"*"
+  }
+})
+
+
+// socket io connectEnd
+
+
+
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -58,18 +76,19 @@ exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 const employeeRoutes = require("./routes/employee");
 const userRoutes = require("./routes/user");
 const paymentRoutes = require("./routes/payments");
-
+const router = require("./routes/chat");
+const { connect } = require("http2");
 // use middleware-------------------------
 app.use(employeeRoutes);
 app.use(userRoutes);
 app.use(paymentRoutes);
-
+app.use(router);
 
 //
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Nexus bank is running now in port:${port}`);
 });
