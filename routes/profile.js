@@ -3,12 +3,13 @@ const router = express.Router();
 
 const { userAccountCollection } = require('../index');
 
-// .......get profile info..............
-router.get("/profile", async (req, res) => {
-    const result = await userAccountCollection.find().toArray();
-    res.send(result);
-    console.log(result)
+// .........get all account............
+router.get("/approved-account", async (req, res) => {
+  const approvedAccounts = await userAccountCollection.find({ status: "approved" }).toArray();
+  res.send(approvedAccounts);
+  console.log(approvedAccounts);
 });
+
 
 router.patch("/update_Profile/:id", async (req, res) => {
     const id = req.params.id;
