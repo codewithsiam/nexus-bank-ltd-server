@@ -7,6 +7,7 @@ router.get("/users", async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });
+
 router.post("/addUser", async (req, res) => {
   const user = req.body;
   const query = { email: user.email };
