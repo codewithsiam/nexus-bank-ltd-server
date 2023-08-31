@@ -8,7 +8,7 @@ router.get("/approved-account", async (req, res) => {
   const approvedAccounts = await userAccountCollection.find({ status: "approved" }).toArray();
   res.send(approvedAccounts);
   console.log(approvedAccounts);
-});
+})
 
 
 router.patch("/update_Profile/:id", async (req, res) => {
