@@ -95,11 +95,12 @@ app.use(loanRoutes);
 app.use(moneyTransfer);
 app.use(userAccounts);
 
-
-//
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
 });
+
+
+
 
 server.listen(port, () => {
   console.log(`Nexus bank is running now in port:${port}`);
