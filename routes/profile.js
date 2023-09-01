@@ -10,23 +10,24 @@ router.get("/approved-account", async (req, res) => {
   console.log(approvedAccounts);
 })
 
+router.patch("/update-Profile/:email", async (req, res) => {
+  const email = req.params.email;
+  const body = req.body;
 
-router.patch("/update_Profile/:id", async (req, res) => {
-    const id = req.params.id;
-    const body = req.body;
-
-    const filter = { _id: new ObjectId(id) };
-    const options = { upsert: true };
-    const updateDoc = {
-      $set: {
-        price: body.price,
-        available_quantity: body.available_quantity,
-        description: body.description,
-      },
-    };
-    const result = await userAccountCollection.updateOne(filter, updateDoc, options);
-    res.send(result);
-  });
-
+  const filter = { email: email };
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      nationality: body.nationality,
+      // birthday: body.birthday,
+      gender: body.gender,
+      profession: body.profession,
+      number: body.number,
+      description: body.description,
+    },
+  };
+  const result = await usersCollection.updateOne(filter, updateDoc, options);
+  res.send(result);
+});
 
 module.exports = router;
