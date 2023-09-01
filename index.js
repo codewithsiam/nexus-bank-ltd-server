@@ -84,6 +84,7 @@ const authCheckRoutes = require("./routes/authCheck");
 const userAccounts = require("./routes/userAccounts")
 const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
+const profile = require("./routes/profile")
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -94,6 +95,7 @@ app.use(authCheckRoutes);
 app.use(loanRoutes);
 app.use(moneyTransfer);
 app.use(userAccounts);
+app.use(profile);
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
