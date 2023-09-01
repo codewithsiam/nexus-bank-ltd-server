@@ -3,6 +3,13 @@ const { usersCollection, paymentCollection } = require('..');
 const router = express.Router();
 const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 
+router.get('/my-transactions', async (req, res) => {
+    const email = req.query.email;
+    console.log(email);
+    const query = {userEmail: email}
+    const result = await paymentCollection.find(query).toArray();
+    res.send(result);
+})
 
 router.post("/create-payment-intent", async (req, res) => {
     try {
