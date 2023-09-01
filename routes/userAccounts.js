@@ -41,8 +41,36 @@ router.get("/pending-account/:searchItem", async (req, res) => {
     const result = await userAccountCollection.find(query).toArray();
     res.send(result);
   } catch (error) {
-    console.error("Error fetching pending accounts:", error);
-    res.status(500).json({ error: "An error occurred while fetching pending accounts" });
+    console.error("Error fetching approved accounts:", error);
+    res.status(500).json({ error: "An error occurred while fetching approved accounts" });
+  }
+});
+// search by name , email in approved account
+router.get("/approved-account/:searchItem", async (req, res) => {
+  const searchItem = req.params.searchItem;
+  if (!searchItem) {
+    return res.status(400).json({ error: "name parameter is required" });
+  }
+
+  const query = {
+    $and: [
+      {
+        $or: [
+          { firstName: { $regex: searchItem, $options: "i" }},
+          { lastName: { $regex: searchItem, $options: "i" }},
+          { email: { $regex: searchItem, $options: "i" }}
+        ],
+      },
+      { status: "approved" } // Add the condition for pending accounts
+    ]
+  };
+
+  try {
+    const result = await userAccountCollection.find(query).toArray();
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching approved accounts:", error);
+    res.status(500).json({ error: "An error occurred while fetching approved accounts" });
   }
 });
 
@@ -52,7 +80,17 @@ router.get("/pending/:filterItem",async(req,res)=>{
   if(!accountType){
     return res.status(400).json({error:"account type is required"})
   }
-  const query = {account_type:accountType};
+  const query = {account_type:accountType,  status: "pending", };
+  const result = await userAccountCollection.find(query).toArray();
+  res.send(result)
+})
+// pending approved filter ------------
+router.get("/approved/:filterItem",async(req,res)=>{
+  const accountType = req.params.filterItem;
+  if(!accountType){
+    return res.status(400).json({error:"account type is required"})
+  }
+  const query = {account_type:accountType,  status: "approved", };
   const result = await userAccountCollection.find(query).toArray();
   res.send(result)
 })
