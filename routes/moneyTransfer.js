@@ -6,6 +6,7 @@ const { mongoClient, userAccountCollection, paymentCollection } = require('../in
 router.put('/money-transfer', async (req, res) => {
     try {
         const data = req.body;
+        console.log("sdfsdf",data);
         console.log('Request Data:', data);
 
         // Sender account data
@@ -15,6 +16,10 @@ router.put('/money-transfer', async (req, res) => {
 
         if (!senderAccount) {
             return res.status(404).send({ message: 'Sender account not found' });
+        }
+        // balance validation 
+        if(senderAccount.balance <= 0 || senderAccount.balance < data.transferAmount) {
+            return res.status(404).send({ message: 'Unsufficient Balance' });
         }
         const senderNewBalance = parseFloat(senderAccount.balance) - parseFloat(data.transferAmount);
         await userAccountCollection.updateOne(senderFilter, { $set: { balance: senderNewBalance } });
@@ -32,10 +37,11 @@ router.put('/money-transfer', async (req, res) => {
             time: new Date(),
             receiverName: data.receiverName,
             accountType: data.accountType,
+            userEmail: data.userEmail,
             senderAccountNumber: senderAccount.account_number,
             receiverAccountNumber: receiverAccount.account_number,
             transferAmount: parseFloat(data.transferAmount),
-            transactionType: transfer,
+            transactionType: "transfer",
         };
 
         await paymentCollection.insertOne(transaction);
