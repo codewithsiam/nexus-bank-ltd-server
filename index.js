@@ -72,6 +72,7 @@ exports.usersCollection = client.db("nexusBankDB").collection("users");
 exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
+exports.optCollection = client.db("nexusBankDB").collection("otps");
 
 
 // Routes-------------------
@@ -85,6 +86,7 @@ const userAccounts = require("./routes/userAccounts")
 const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
+const sendOtp = require("./routes/sendOtp")
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -96,6 +98,7 @@ app.use(loanRoutes);
 app.use(moneyTransfer);
 app.use(userAccounts);
 app.use(profile);
+app.use(sendOtp);
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
