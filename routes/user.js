@@ -19,6 +19,4 @@ router.post("/addUser", async (req, res) => {
   res.send(result);
 });
 
-
-
 module.exports = router;
