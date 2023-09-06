@@ -1,7 +1,10 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
+
 // const { userAccountCollection } = require("..");
 const { usersCollection, userAccountCollection } = require("../index");
 const { ObjectId } = require("mongodb");
+const { sendEmail } = require("../Modules/emailSend");
 const router = express.Router();
 
 /// store account --------------
@@ -105,8 +108,9 @@ router.get("/approved-accounts", async (req, res) => {
 })
 
 
-
-// ------------------------- account create/ update --------------------
+// ----------------------------------------------------------------------//
+// ------------------------- account create/ update --------------------//
+// ----------------------------------------------------------------------//
 
 // Function to generate a unique 10-digit account number
 const generateRandomPassword = (length) => {
@@ -173,12 +177,14 @@ router.patch("/status/:id", async (req, res) => {
 
         // Generate a random password for the new user (at least 6 characters long)
         const password = generateRandomPassword(8);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = {
           username: username,
           nid_card_number: nid_card_number,
           status: "active",
-          password: password, // Include the generated password
+          password: hashedPassword, // Include the generated password
+
           accounts: [
             {
               account_number: accountNumber,
@@ -198,7 +204,55 @@ router.patch("/status/:id", async (req, res) => {
           },
         };
         await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
-        console.log("from 1st")
+
+        const subject = `Your Account is Approved (${accountInfo.account_type}) - Here are Your Login Credentials`;
+        const htmlText = `
+       
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Our Service</title>
+  <style>
+    /* Add your custom CSS styles here, e.g., for styling the email content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      color: #333;
+    }
+    .username {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Our Service</h1>
+    <p>Thank you for creating an account with us. Your account Number is: ${accountNumber} <br> Here are your login credentials:</p>
+    <p><span class="username">Username:</span> ${username}</p>
+    <p><span class="username">Password:</span> ${password}</p>
+    <p>Please keep your login information secure and do not share it with others. You can now use your username and password to access our services.</p>
+    <p>If you have any questions or need assistance, please don't hesitate to <a href="mailto:nexusbltd@gmail.com">contact our support team</a>.</p>
+    <p>Best regards,<br>Your Service Team<br>Nexus Bank LTD.</p>
+  </div>
+</body>
+</html>
+
+        `
+
+        await sendEmail(email, subject, htmlText);
+
         res.status(201).send(insertResult);
 
       } else {
@@ -216,13 +270,13 @@ router.patch("/status/:id", async (req, res) => {
         };
 
         if (!Array.isArray(existingUser.accounts)) {
-          existingUser.accounts = []; // Initialize accounts as an empty array if it's not an array
+          existingUser.accounts = [];
         }
 
-        existingUser.accounts.push(newAccount); // Add the new account to the existing accounts
+        existingUser.accounts.push(newAccount);
 
         updateDoc.$set.username = existingUser.username;
-        updateDoc.$set.accounts = existingUser.accounts; // Update the accounts field in the updateDoc
+        updateDoc.$set.accounts = existingUser.accounts;
 
         const query = { _id: existingUser._id };
         const result = await usersCollection.updateOne(query, updateDoc);
@@ -234,7 +288,54 @@ router.patch("/status/:id", async (req, res) => {
           },
         };
         await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
-console.log("from 2nd")
+
+        const subject = `Approved Your Account: ${accountInfo.account_type}`;
+        const htmlText = `
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Account is Approved</title>
+  <style>
+    /* Add your custom CSS styles here, e.g., for styling the email content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      color: #333;
+    }
+    .account-number {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Account is Approved</h1>
+    <p>Dear ${username},</p>
+    <p>We are pleased to inform you that your account with ${accountInfo.account_type} has been approved and is now active. You can log in to your account using your account number:</p>
+    <p><span class="account-number">Account Number:</span> ${accountNumber}</p>
+    <p>If you have any questions or need assistance, please don't hesitate to <a href="mailto:nexusbltd@gmail.com">contact our support team</a>.</p>
+    <p>Thank you for choosing [Your Service Name]. We look forward to serving you.</p>
+    <p>Best regards,<br>Your Service Team</p>
+  </div>
+</body>
+</html>
+
+        `
+        await sendEmail(email, subject, htmlText);
+
         res.send(result);
 
       }
