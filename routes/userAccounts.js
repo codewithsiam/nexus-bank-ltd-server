@@ -201,6 +201,7 @@ router.patch("/status/:id", async (req, res) => {
         let updateDocAccount = {
           $set: {
             status: "approved",
+            balance: 0
           },
         };
         await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
@@ -275,7 +276,6 @@ router.patch("/status/:id", async (req, res) => {
 
         existingUser.accounts.push(newAccount);
 
-        updateDoc.$set.username = existingUser.username;
         updateDoc.$set.accounts = existingUser.accounts;
 
         const query = { _id: existingUser._id };
@@ -285,6 +285,7 @@ router.patch("/status/:id", async (req, res) => {
         let updateDocAccount = {
           $set: {
             status: "approved",
+            balance: 0
           },
         };
         await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
