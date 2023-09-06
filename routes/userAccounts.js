@@ -207,8 +207,6 @@ router.patch("/status/:id", async (req, res) => {
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
 
-
-
         // Create a new account object
         const newAccount = {
           account_number: accountNumber,
