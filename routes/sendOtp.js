@@ -107,7 +107,7 @@ router.post('/verify-otp', async (req, res) => {
         if (verificationResult.verified === true) {
             return res.status(200).json({ verified: true, message: 'OTP is valid.' });
         } else {
-            return res.status(400).json({ verified: false, message: verificationResult });
+            return res.status(400).json(verificationResult);
         }
     } catch (error) {
         console.error(error);
