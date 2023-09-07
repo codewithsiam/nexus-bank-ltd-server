@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 const { mongoClient, employeeCollection, usersCollection } = require('../index');
 
@@ -28,14 +29,22 @@ router.get('/auth-check', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-router.get('/login', async (req, res) => {
+
+//login user
+router.post('/login', async (req, res) => {
+  console.log(req.query);
+  
     try {
-        const { password, email, role } = req.body;
+        const { password, username } = req.query;
+        // console.log(username);
+        const pass = `${username}${password}`
+        console.log(pass);
         let result;
-        result = await user.findOne({ email: email });
+        result = await usersCollection.findOne({ username: username });
         if (result) {
           bcrypt.compare(password, result.password, function (err, response) { 
             if (err) {
+              console.log(err);
               res.status(200).json({
                 status: false,
                 message: err.message,
@@ -43,7 +52,7 @@ router.get('/login', async (req, res) => {
             }
             if (response) {
               const token = jwt.sign(
-                { email: result._id },
+                { username: result._id },
                 process.env.WEB_TOKEN_SECRET,
                 { expiresIn: "1d" }
               );
@@ -64,7 +73,7 @@ router.get('/login', async (req, res) => {
         } else {
           res.status(200).json({
             status: false,
-            message: "Invalid Email",
+            message: "Invalid username",
           });
         }
       } catch (error) {
