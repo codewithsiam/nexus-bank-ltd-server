@@ -65,24 +65,6 @@ router.post('/change-password', (req, res) => {
   res.status(200).json({ message: 'Password changed successfully' });
 });
 
-// router.patch("/update-Profile/:email", async (req, res) => {
-//   const email = req.params.email;
-//   const body = req.body;
-//   console.log(email)
-//   const filter = { email: email };
-//   const options = { upsert: true };
-//   const updateDoc = {
-//     $set: {
-//       nationality: body.nationality,
-//       birthDate: body.birthDate,
-//       gender: body.gender,
-//       profession: body.profession,
-//       number: body.number,
-//       description: body.description,
-//     },
-//   };
-//   const result = await usersCollection.updateOne(filter, updateDoc, options);
-//   res.send(result);
-// });
+
 
 module.exports = router;
