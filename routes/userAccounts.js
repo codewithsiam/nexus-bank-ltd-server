@@ -379,7 +379,14 @@ router.put("/feedback/:id", async (req, res) => {
 });
 
 
-
+router.get("/myAccounts", async (req, res) => {
+  const { nidNumber } = req.query;
+  if (!nidNumber) {
+    return res.send({ success: false, message: "Nid number not valid" });
+  }
+  const accounts = await userAccountCollection.find({ nid_card_number: nidNumber }).toArray();
+  return res.send(accounts);
+})
 
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;

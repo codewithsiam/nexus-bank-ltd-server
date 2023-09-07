@@ -2,8 +2,95 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const { verifyJWT } = require("../Modules/verifyJWT");
 
 const { mongoClient, employeeCollection, usersCollection, userAccountCollection } = require('../index');
+
+
+// Login route
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.query;
+
+    const user = await usersCollection.findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({ error: true, message: "Invalid credentials" });
+    }
+
+    bcrypt.compare(password, user.password, (err, response) => {
+      if (err) {
+        return res.status(500).json({ error: true, message: err.message });
+      }
+
+      if (response) {
+        const token = jwt.sign({ username: user.username }, process.env.WEB_TOKEN_SECRET, {
+          expiresIn: "1d",
+        });
+
+        res.status(200).json({
+          success: true,
+          message: "Login successful",
+          result: user,
+          token: token,
+        });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Passwords do not match",
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+});
+
+// Profile route (protected with JWT authentication)
+router.get("/user/profile", verifyJWT, async (req, res) => {
+  try {
+    const username = req.decoded.username;
+
+    const user = await usersCollection.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ error: true, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, result: user });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
+// account number to email getting api 
+router.get('/account-to-email', async (req, res) => {
+  try {
+    const { accountNumber } = req.query;
+
+    // Assuming userAccountCollection is a MongoDB collection, use findOne to find a user by accountNumber
+    const user = await userAccountCollection.findOne({ accountNumber });
+
+    if (user) {
+      const email = user.email;
+     return res.status(200).json({success: true, message: "Email find successfully"});
+    } else {
+      return res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
 
 router.get('/auth-check', async (req, res) => {
   const email = req.query.email;
@@ -29,80 +116,5 @@ router.get('/auth-check', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-//login user
-router.post('/login', async (req, res) => {
-  console.log(req.query);
-
-  try {
-    const { password, username } = req.query;
-    // console.log(username);
-    const pass = `${username}${password}`
-    console.log(pass);
-    let result;
-    result = await usersCollection.findOne({ username: username });
-    if (result) {
-      bcrypt.compare(password, result.password, function (err, response) {
-        if (err) {
-          console.log(err);
-          res.status(200).json({
-            status: false,
-            message: err.message,
-          });
-        }
-        if (response) {
-          const token = jwt.sign(
-            { username: result._id },
-            process.env.WEB_TOKEN_SECRET,
-            { expiresIn: "1d" }
-          );
-          res.status(200).json({
-            status: true,
-            message: "login successful",
-            result: result,
-            token: token,
-          });
-        } else {
-          // response is OutgoingMessage object that server response http request
-          res.json({
-            success: false,
-            message: "passwords do not match",
-          });
-        }
-      });
-    } else {
-      res.status(200).json({
-        status: false,
-        message: "Invalid username",
-      });
-    }
-  } catch (error) {
-    res.status(200).json({
-      status: false,
-      message: error.message,
-    });
-  }
-});
-
-// account number to email getting api 
-router.get('/account-to-email', async (req, res) => {
-  try {
-    const { accountNumber } = req.query;
-
-    // Assuming userAccountCollection is a MongoDB collection, use findOne to find a user by accountNumber
-    const user = await userAccountCollection.findOne({ accountNumber });
-
-    if (user) {
-      const email = user.email;
-     return res.status(200).json({success: true, message: "Email find successfully"});
-    } else {
-      return res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'An error occurred' });
-  }
-});
-
 
 module.exports = router;
