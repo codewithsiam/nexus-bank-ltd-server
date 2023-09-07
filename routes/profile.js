@@ -13,7 +13,7 @@ router.get("/approved-account", async (req, res) => {
 router.patch("/update-Profile/:email", async (req, res) => {
   const email = req.params.email;
   const body = req.body;
-
+console.log(email)
   const filter = { email: email };
   const options = { upsert: true };
   const updateDoc = {
