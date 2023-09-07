@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { optCollection } = require('../index');
+const { optCollection, userAccountCollection } = require('../index');
 const { sendEmail } = require('../Modules/emailSend');
 
 // for generate OTP
@@ -57,18 +57,35 @@ const verifyAndClearOTP = async (email, userEnteredOTP) => {
 };
 
 
-
+// accountNumber/email and username required 
 router.get('/send-otp', async (req, res) => {
+    const { accountNumber, email, userName } = req.query;
+
     try {
-        const { email, userName } = req.query;
-        //validation 
-        if (!email) {
-            res.send({ send: false, message: "Email not found" });
-            return;
+
+        if (!accountNumber && !email) {
+            return res.status(400).json({ success: false, message: "Account number or email not found" });
         }
-        const otp = await generateAndStoreOTP(email);
-        console.log(otp);
-// email template 
+
+        let userEmail;
+
+        if (accountNumber) {
+            const user = await userAccountCollection.findOne({ accountNumber });
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+
+            userEmail = user.email;
+        } else {
+            // If an email is directly provided, use it
+            userEmail = email;
+        }
+
+        // Generate and store OTP
+        const otp = await generateAndStoreOTP(userEmail);
+
+        // Email template
         const htmlText = `
         <html>
           <body>
@@ -84,35 +101,57 @@ router.get('/send-otp', async (req, res) => {
       `;
 
         const subject = 'OTP Verification';
-// call the email function to send the otp
-        const result = await sendEmail(email, subject, htmlText);
+
+        // Send the email with OTP
+        const result = await sendEmail(userEmail, subject, htmlText);
+
         res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: "An error occurred while sending the email." });
+        res.status(500).json({ success: false, message: "An error occurred while sending the email." });
     }
 });
 
 router.post('/verify-otp', async (req, res) => {
+    const { accountNumber, email, otp } = req.query;
+console.log(
+
+    'sdfsdkfj'
+)
     try {
-        const { email, otp } = req.query;
-        // validation 
-        if (!email && !otp) {
-            res.send({ status: false, message: "email or otp is missing" });
-            return;
+        // Validation - Check if either accountNumber or email and otp are provided
+        if ((!accountNumber && !email) || !otp) {
+            return res.status(400).json({ status: false, message: "Account number or email or otp is missing" });
         }
-        // call the verifyAndClear OTP function
-        const verificationResult = await verifyAndClearOTP(email, otp);
+
+        let userEmail;
+
+        // If an accountNumber is provided, find the associated email
+        if (accountNumber) {
+            const user = await userAccountCollection.findOne({ accountNumber });
+
+            if (!user) {
+                return res.status(404).json({ status: false, message: "User not found" });
+            }
+
+            userEmail = user.email;
+        } else {
+            // If an email is directly provided, use it
+            userEmail = email;
+        }
+console.log(userEmail);
+        // Call the verifyAndClearOTP function
+        const verificationResult = await verifyAndClearOTP(userEmail, otp);
 
         if (verificationResult.verified === true) {
             return res.status(200).json({ verified: true, message: 'OTP is valid.' });
         } else {
-            return res.status(400).json({ verified: false, message: verificationResult });
+            return res.status(400).json(verificationResult);
         }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "An error occurred while verifying the OTP." });
     }
-});
+});;
 
 module.exports = router;
