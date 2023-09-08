@@ -90,4 +90,17 @@ router.patch("/add-beneficiary", async (req, res) => {
   }
 });
 
+// get beneficiary list -----------
+router.get("/beneficiaryList/:username", async (req,res)=>{
+  const username = req.params.username;
+  console.log(username)
+  const query = {username:username};
+  const result = await usersCollection.findOne(query);
+  if (result) {
+    res.send(result.beneficiaryList);
+  } else {
+    res.status(404).send("User not found");
+  }
+})
+
 module.exports = router;
