@@ -73,6 +73,7 @@ exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
 exports.optCollection = client.db("nexusBankDB").collection("otps");
+exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 
 
 // Routes-------------------

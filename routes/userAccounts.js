@@ -1,8 +1,12 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 // const { userAccountCollection } = require("..");
-const { usersCollection, userAccountCollection } = require("../index");
+const {
+  usersCollection,
+  userAccountCollection,
+  depositPackage,
+} = require("../index");
 const { ObjectId } = require("mongodb");
 const { sendEmail } = require("../Modules/emailSend");
 const router = express.Router();
@@ -16,9 +20,9 @@ router.post("/add-account", async (req, res) => {
 
 // get all pending accounts ----------
 router.get("/requested-accounts", async (req, res) => {
-  const query = { status: "pending" }
+  const query = { status: "pending" };
   const result = await userAccountCollection.find(query).toArray();
-  res.send(result)
+  res.send(result);
 });
 
 // search by name , email in pending account
@@ -34,11 +38,11 @@ router.get("/pending-account/:searchItem", async (req, res) => {
         $or: [
           { firstName: { $regex: searchItem, $options: "i" } },
           { lastName: { $regex: searchItem, $options: "i" } },
-          { email: { $regex: searchItem, $options: "i" } }
+          { email: { $regex: searchItem, $options: "i" } },
         ],
       },
-      { status: "pending" } // Add the condition for pending accounts
-    ]
+      { status: "pending" }, // Add the condition for pending accounts
+    ],
   };
 
   try {
@@ -46,7 +50,9 @@ router.get("/pending-account/:searchItem", async (req, res) => {
     res.send(result);
   } catch (error) {
     console.error("Error fetching approved accounts:", error);
-    res.status(500).json({ error: "An error occurred while fetching approved accounts" });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching approved accounts" });
   }
 });
 // search by name , email in approved account
@@ -62,11 +68,11 @@ router.get("/approved-account/:searchItem", async (req, res) => {
         $or: [
           { firstName: { $regex: searchItem, $options: "i" } },
           { lastName: { $regex: searchItem, $options: "i" } },
-          { email: { $regex: searchItem, $options: "i" } }
+          { email: { $regex: searchItem, $options: "i" } },
         ],
       },
-      { status: "approved" } // Add the condition for pending accounts
-    ]
+      { status: "approved" }, // Add the condition for pending accounts
+    ],
   };
 
   try {
@@ -74,7 +80,9 @@ router.get("/approved-account/:searchItem", async (req, res) => {
     res.send(result);
   } catch (error) {
     console.error("Error fetching approved accounts:", error);
-    res.status(500).json({ error: "An error occurred while fetching approved accounts" });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching approved accounts" });
   }
 });
 
@@ -82,30 +90,29 @@ router.get("/approved-account/:searchItem", async (req, res) => {
 router.get("/pending/:filterItem", async (req, res) => {
   const accountType = req.params.filterItem;
   if (!accountType) {
-    return res.status(400).json({ error: "account type is required" })
+    return res.status(400).json({ error: "account type is required" });
   }
-  const query = { account_type: accountType, status: "pending", };
+  const query = { account_type: accountType, status: "pending" };
   const result = await userAccountCollection.find(query).toArray();
-  res.send(result)
-})
+  res.send(result);
+});
 // pending approved filter ------------
 router.get("/approved/:filterItem", async (req, res) => {
   const accountType = req.params.filterItem;
   if (!accountType) {
-    return res.status(400).json({ error: "account type is required" })
+    return res.status(400).json({ error: "account type is required" });
   }
-  const query = { account_type: accountType, status: "approved", };
+  const query = { account_type: accountType, status: "approved" };
   const result = await userAccountCollection.find(query).toArray();
-  res.send(result)
-})
-
+  res.send(result);
+});
 
 // get all approved accounts --------
 router.get("/approved-accounts", async (req, res) => {
   const query = { status: "approved" };
   const result = await userAccountCollection.find(query).toArray();
   res.send(result);
-})
+});
 
 // ----------------------------------------------------------------------//
 // ------------------------- account create/ update --------------------//
@@ -113,7 +120,8 @@ router.get("/approved-accounts", async (req, res) => {
 
 // Function to generate a unique 10-digit account number
 const generateRandomPassword = (length) => {
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let password = "";
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charset.length);
@@ -121,7 +129,6 @@ const generateRandomPassword = (length) => {
   }
   return password;
 };
-
 
 const generateUniqueAccountNumber = () => {
   // Generate a random 6-digit number
@@ -133,12 +140,14 @@ const generateUniqueAccountNumber = () => {
   return accountNumber;
 };
 
-// handle status 
+// handle status
 router.patch("/status/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const status = req.query.status;
-    const accountInfo = await userAccountCollection.findOne({ _id: new ObjectId(id) });
+    const accountInfo = await userAccountCollection.findOne({
+      _id: new ObjectId(id),
+    });
 
     if (!accountInfo) {
       return res.status(404).send({ error: "Account not found" });
@@ -162,7 +171,9 @@ router.patch("/status/:id", async (req, res) => {
         let i = 1;
         while (true) {
           const potentialUsername = username + i;
-          const userWithSameUsername = await usersCollection.findOne({ username: potentialUsername });
+          const userWithSameUsername = await usersCollection.findOne({
+            username: potentialUsername,
+          });
           if (!userWithSameUsername) {
             username = potentialUsername;
             break;
@@ -194,16 +205,18 @@ router.patch("/status/:id", async (req, res) => {
           ],
         };
 
-
         const insertResult = await usersCollection.insertOne(newUser);
-        // update status in the userAccountCollection 
+        // update status in the userAccountCollection
         let updateDocAccount = {
           $set: {
             status: "approved",
-            balance: 0
+            balance: 0,
           },
         };
-        await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
+        await userAccountCollection.updateOne(
+          { _id: new ObjectId(id) },
+          updateDocAccount
+        );
 
         const subject = `Your Account is Approved (${accountInfo.account_type}) - Here are Your Login Credentials`;
         const htmlText = `
@@ -249,12 +262,11 @@ router.patch("/status/:id", async (req, res) => {
 </body>
 </html>
 
-        `
+        `;
 
         await sendEmail(email, subject, htmlText);
 
         res.status(201).send(insertResult);
-
       } else {
         // User with the same NID card number exists, update their account
         const accountNumber = await generateUniqueAccountNumber();
@@ -280,14 +292,17 @@ router.patch("/status/:id", async (req, res) => {
         const query = { _id: existingUser._id };
         const result = await usersCollection.updateOne(query, updateDoc);
 
-        // update status in the userAccountCollection 
+        // update status in the userAccountCollection
         let updateDocAccount = {
           $set: {
             status: "approved",
-            balance: 0
+            balance: 0,
           },
         };
-        await userAccountCollection.updateOne({ _id: new ObjectId(id) }, updateDocAccount);
+        await userAccountCollection.updateOne(
+          { _id: new ObjectId(id) },
+          updateDocAccount
+        );
 
         const subject = `Approved Your Account: ${accountInfo.account_type}`;
         const htmlText = `
@@ -333,11 +348,10 @@ router.patch("/status/:id", async (req, res) => {
 </body>
 </html>
 
-        `
+        `;
         await sendEmail(email, subject, htmlText);
 
         res.send(result);
-
       }
     } else {
       // Update the status in the userAccountCollection
@@ -347,7 +361,10 @@ router.patch("/status/:id", async (req, res) => {
         },
       };
       const query = { _id: new ObjectId(id) };
-      const result = await userAccountCollection.updateOne(query, updateDocAccount);
+      const result = await userAccountCollection.updateOne(
+        query,
+        updateDocAccount
+      );
       res.send(result);
     }
   } catch (error) {
@@ -356,14 +373,10 @@ router.patch("/status/:id", async (req, res) => {
   }
 });
 
-
-
-
-
 // handle feedback ---------
 router.put("/feedback/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id)
+  console.log(id);
   const { feedback } = req.body;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
@@ -376,9 +389,6 @@ router.put("/feedback/:id", async (req, res) => {
   res.send(result);
 });
 
-
-
-
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;
   const filter = { email: email };
@@ -386,5 +396,50 @@ router.get("/user-accounts", async (req, res) => {
   res.send(result);
 });
 
+// deposit account -------------------------------
+
+const findInterestRateAndMaturityValue = async (
+  selectedAmount,
+  selectedYears
+) => {
+  // console.log(selectedYears.toString())
+  const query = { amountPerMonth: selectedAmount };
+  const package = await depositPackage.findOne(query);
+  // console.log("my package",package.years[selectedYears])
+
+  if (package && package.years && package.years[selectedYears]) {
+    return package.years[selectedYears];
+  }
+
+  return null;
+};
+
+router.post("/create-deposit-account", async (req, res) => {
+  const account = req.body;
+  console.log(account)
+  // console.log(selectedAmount,selectedYears)
+
+  // Find the interest rate and maturity value based on user input
+  const interestRateAndMaturityValue = await findInterestRateAndMaturityValue(
+    account.selectedAmount,
+    account.selectedYears
+  );
+  console.log("426", interestRateAndMaturityValue)
+
+  if (interestRateAndMaturityValue) {
+    
+    const interestRate = interestRateAndMaturityValue.interestRate;
+    const maturityValue = interestRateAndMaturityValue.maturityValue;
+    account.interestRate = interestRate;
+    account.maturityValue = maturityValue;
+    const result = await userAccountCollection.insertOne(account);
+    res.send(result);
+
+  } else {
+    res.json({
+      message: "Data not found for the selected amount and years.",
+    });
+  }
+});
 
 module.exports = router;
