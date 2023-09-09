@@ -416,15 +416,15 @@ const findInterestRateAndMaturityValue = async (
 
 router.post("/create-deposit-account", async (req, res) => {
   const account = req.body;
-  console.log(account)
+  // console.log(account)
   // console.log(selectedAmount,selectedYears)
 
   // Find the interest rate and maturity value based on user input
   const interestRateAndMaturityValue = await findInterestRateAndMaturityValue(
-    account.selectedAmount,
+    account.amountPerMonth,
     account.selectedYears
   );
-  console.log("426", interestRateAndMaturityValue)
+  // console.log("426", interestRateAndMaturityValue)
 
   if (interestRateAndMaturityValue) {
     
