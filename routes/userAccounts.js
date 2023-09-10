@@ -164,6 +164,7 @@ router.patch("/status/:id", async (req, res) => {
 
     if (status === "approved") {
       const existingUser = await usersCollection.findOne({ nid_card_number });
+      const accountNumber = await generateUniqueAccountNumber();
 
       if (!existingUser) {
         // User with the same NID card number does not exist, create a new user
@@ -181,7 +182,6 @@ router.patch("/status/:id", async (req, res) => {
           i++;
         }
 
-        const accountNumber = await generateUniqueAccountNumber();
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
 
@@ -211,6 +211,7 @@ router.patch("/status/:id", async (req, res) => {
           $set: {
             status: "approved",
             balance: 0,
+            accountNumber,
           },
         };
         await userAccountCollection.updateOne(
@@ -268,8 +269,7 @@ router.patch("/status/:id", async (req, res) => {
 
         res.status(201).send(insertResult);
       } else {
-        // User with the same NID card number exists, update their account
-        const accountNumber = await generateUniqueAccountNumber();
+
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
 
@@ -297,6 +297,7 @@ router.patch("/status/:id", async (req, res) => {
           $set: {
             status: "approved",
             balance: 0,
+            accountNumber
           },
         };
         await userAccountCollection.updateOne(
@@ -388,6 +389,16 @@ router.put("/feedback/:id", async (req, res) => {
   const result = await userAccountCollection.updateOne(query, updateDoc);
   res.send(result);
 });
+
+
+router.get("/myAccounts", async (req, res) => {
+  const { nidNumber } = req.query;
+  if (!nidNumber) {
+    return res.send({ success: false, message: "Nid number not valid" });
+  }
+  const accounts = await userAccountCollection.find({ nid_card_number: nidNumber }).toArray();
+  return res.send(accounts);
+})
 
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;
