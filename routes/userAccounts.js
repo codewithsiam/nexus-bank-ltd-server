@@ -128,17 +128,20 @@ const generateUniqueAccountNumber = () => {
   const randomNumber = Math.floor(100000 + Math.random() * 900000);
 
   // Add a prefix to the random number (customize the prefix as needed)
-  const accountNumber = `ACCT${randomNumber}`;
+  const accountNumber = `NBL${randomNumber}`;
 
   return accountNumber;
 };
-
+const username = "Siam";
+console.log(username.toLocaleLowerCase());
 // handle status 
 router.patch("/status/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const status = req.query.status;
+    console.log(status, id);
     const accountInfo = await userAccountCollection.findOne({ _id: new ObjectId(id) });
+    console.log(accountInfo);
 
     if (!accountInfo) {
       return res.status(404).send({ error: "Account not found" });
@@ -159,7 +162,7 @@ router.patch("/status/:id", async (req, res) => {
 
       if (!existingUser) {
         // User with the same NID card number does not exist, create a new user
-        let username = lastName;
+        let username = lastName.toLocaleLowerCase();
         let i = 1;
         while (true) {
           const potentialUsername = username + i;

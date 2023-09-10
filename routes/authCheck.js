@@ -69,6 +69,36 @@ router.get("/user/profile", verifyJWT, async (req, res) => {
   }
 });
 
+// password change 
+router.post('/change-password', verifyJWT, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await usersCollection.findOne({ username: req.decoded.username });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Incorrect old password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await usersCollection.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
+
+    res.status(200).json({ success: true, message: 'Password changed' });
+  } catch (error) {
+    console.error('Error in /user/change-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An internal server error occurred while changing the password.',
+    });
+  }
+});
+
 
 // account number to email getting api 
 router.get('/account-to-email', async (req, res) => {
@@ -80,7 +110,7 @@ router.get('/account-to-email', async (req, res) => {
 
     if (user) {
       const email = user.email;
-     return res.status(200).json({success: true, message: "Email find successfully"});
+      return res.status(200).json({ success: true, message: "Email find successfully" });
     } else {
       return res.status(404).json({ error: 'User not found' });
     }
