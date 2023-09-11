@@ -11,7 +11,7 @@ const { mongoClient, employeeCollection, usersCollection, userAccountCollection 
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username, password); 
+    console.log(username, password);
 
 
     const user = await usersCollection.findOne({ username });
@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
       const employee = await employeeCollection.findOne({ username });
 
       if (!employee) {
-        return res.status(401).json({  success: false, message: "Invalid credentials" });
+        return res.status(401).json({ success: false, message: "Invalid credentials" });
       }
 
 
@@ -94,21 +94,30 @@ router.post("/login", async (req, res) => {
 
 
 // Profile route (protected with JWT authentication)
-router.get("/user/profile", verifyJWT, async (req, res) => {
+router.get("/profileMonitor", verifyJWT, async (req, res) => {
   try {
     const username = req.decoded.username;
 
     const user = await usersCollection.findOne({ username });
 
     if (!user) {
+      const employee = await employeeCollection.findOne({ username });
+      if (employee) {
+        return res.status(200).json({
+          success: true,
+          result: employee,
+          isAdmin: true,
+        });
+      }
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, result: user });
+    res.status(200).json({ success: true, result: user, isAdmin: true });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
+      isAdmin: false,
     });
   }
 });
