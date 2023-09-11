@@ -10,61 +10,151 @@ const { mongoClient, employeeCollection, usersCollection, userAccountCollection 
 // Login route
 router.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.query;
+    const { username, password } = req.body;
+    console.log(username, password);
+
 
     const user = await usersCollection.findOne({ username });
 
-    if (!user) {
-      return res.status(401).json({ error: true, message: "Invalid credentials" });
-    }
 
-    bcrypt.compare(password, user.password, (err, response) => {
-      if (err) {
-        return res.status(500).json({ error: true, message: err.message });
+    if (!user) {
+      const employee = await employeeCollection.findOne({ username });
+
+      if (!employee) {
+        return res.status(401).json({ success: false, message: "Invalid credentials" });
       }
 
-      if (response) {
-        const token = jwt.sign({ username: user.username }, process.env.WEB_TOKEN_SECRET, {
-          expiresIn: "1d",
-        });
 
-        res.status(200).json({
+      if (!employee.password) {
+        return res.status(401).json({ success: false, message: "Password not found for employee" });
+      }
+
+
+      const isPasswordMatch = await bcrypt.compare(password, employee.password);
+
+      if (isPasswordMatch) {
+        const token = jwt.sign(
+          { username: employee.username },
+          process.env.WEB_TOKEN_SECRET,
+          {
+            expiresIn: "1d",
+          }
+        );
+
+        return res.status(200).json({
           success: true,
           message: "Login successful",
-          result: user,
+          result: employee,
+          isAdmin: true,
           token: token,
         });
       } else {
-        res.status(401).json({
+        return res.status(401).json({
           success: false,
           message: "Passwords do not match",
         });
       }
-    });
+    } else {
+
+      if (!user.password) {
+        return res.status(401).json({ error: true, message: "Password not found for user" });
+      }
+
+
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+      if (isPasswordMatch) {
+        const token = jwt.sign({ username: user.username }, process.env.WEB_TOKEN_SECRET, {
+          expiresIn: "1d",
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "Login successful",
+          result: user,
+          token: token,
+          isAdmin: false,
+        });
+      } else {
+        return res.status(401).json({
+          success: false,
+          message: "Passwords do not match",
+        });
+      }
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: error.message,
     });
   }
 });
 
+
+
+
 // Profile route (protected with JWT authentication)
-router.get("/user/profile", verifyJWT, async (req, res) => {
+router.get("/profileMonitor", verifyJWT, async (req, res) => {
   try {
     const username = req.decoded.username;
 
     const user = await usersCollection.findOne({ username });
 
     if (!user) {
+      const employee = await employeeCollection.findOne({ username });
+      if (employee) {
+        return res.status(200).json({
+          success: true,
+          result: employee,
+          isAdmin: true,
+        });
+      }
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, result: user });
+    res.status(200).json({ success: true, result: user, isAdmin: true });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
+      isAdmin: false,
+    });
+  }
+});
+
+// password change 
+router.post('/change-password', verifyJWT, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await usersCollection.findOne({ username: req.decoded.username });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Incorrect old password' });
+    }
+    const isOldPassword = await bcrypt.compare(newPassword, user.password);
+
+
+    if (isOldPassword) {
+      return res.status(401).json({ success: false, message: 'Your old password and new password are same, Please try another one' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await usersCollection.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
+
+    res.status(200).json({ success: true, message: 'Password changed' });
+  } catch (error) {
+    console.error('Error in /change-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An internal server error occurred while changing the password.',
     });
   }
 });
@@ -80,7 +170,7 @@ router.get('/account-to-email', async (req, res) => {
 
     if (user) {
       const email = user.email;
-     return res.status(200).json({success: true, message: "Email find successfully"});
+      return res.status(200).json({ success: true, message: "Email find successfully" });
     } else {
       return res.status(404).json({ error: 'User not found' });
     }

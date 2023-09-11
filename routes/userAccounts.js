@@ -135,7 +135,7 @@ const generateUniqueAccountNumber = () => {
   const randomNumber = Math.floor(100000 + Math.random() * 900000);
 
   // Add a prefix to the random number (customize the prefix as needed)
-  const accountNumber = `ACCT${randomNumber}`;
+  const accountNumber = `NBL${randomNumber}`;
 
   return accountNumber;
 };
@@ -168,7 +168,7 @@ router.patch("/status/:id", async (req, res) => {
 
       if (!existingUser) {
         // User with the same NID card number does not exist, create a new user
-        let username = lastName;
+        let username = lastName.toLocaleLowerCase();
         let i = 1;
         while (true) {
           const potentialUsername = username + i;
