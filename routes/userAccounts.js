@@ -114,6 +114,30 @@ router.get("/approved-accounts", async (req, res) => {
   res.send(result);
 });
 
+router.get('/current-user-account', async (req, res) => {
+  const filter = 'Current Account'
+  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  res.send(result)
+})
+
+router.get('/deposit-user-account', async(req,res)=>{
+  const filter = 'Deposit Account';
+  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  res.send(result)
+})
+
+router.get('/saving-user-account', async(req,res)=>{
+  const filter = 'Saving Account';
+  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  res.send(result)
+})
+
+router.get('/student-user-account', async(req,res)=>{
+  const filter = 'Student Account';
+  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  res.send(result)
+})
+
 // ----------------------------------------------------------------------//
 // ------------------------- account create/ update --------------------//
 // ----------------------------------------------------------------------//
@@ -438,7 +462,7 @@ router.post("/create-deposit-account", async (req, res) => {
   // console.log("426", interestRateAndMaturityValue)
 
   if (interestRateAndMaturityValue) {
-    
+
     const interestRate = interestRateAndMaturityValue.interestRate;
     const maturityValue = interestRateAndMaturityValue.maturityValue;
     account.interestRate = interestRate;
