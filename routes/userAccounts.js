@@ -132,8 +132,7 @@ const generateUniqueAccountNumber = () => {
 
   return accountNumber;
 };
-const username = "Siam";
-console.log(username.toLocaleLowerCase());
+
 // handle status 
 router.patch("/status/:id", async (req, res) => {
   try {
