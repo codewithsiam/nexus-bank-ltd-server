@@ -44,9 +44,6 @@ router.patch("/update-Profile/:email", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    // Close the MongoDB client connection when done
-    client.close();
   }
 });
 
