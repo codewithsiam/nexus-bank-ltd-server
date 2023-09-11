@@ -10,17 +10,6 @@ router.patch("/update-Profile/:email", async (req, res) => {
     const email = req.params.email;
     const body = req.body;
 
-    // Validate the incoming data here
-
-    if (!body.nationality || !body.birthDate || !body.gender || !body.profession || !body.number || !body.description) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-
-    // Ensure you have connected to the MongoDB database
-    await client.connect();
-
-    const usersCollection = client.db('your-database-name').collection('users');
-
     const filter = { email: email };
     const options = { upsert: true };
     const updateDoc = {
@@ -39,9 +28,9 @@ router.patch("/update-Profile/:email", async (req, res) => {
     if (result.matchedCount === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     res.status(200).json({ message: 'Profile updated successfully' });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -52,7 +41,7 @@ router.post('/change-password', (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   // Replace this with your actual user authentication logic
-  const user = usersCollection.find((inputPass) => inputPass.password === oldPassword);
+  const user = userAccountCollection.find((inputPass) => inputPass.password === oldPassword);
   if (!user) {
     return res.status(401).json({ error: 'Invalid old password' });
   }
@@ -61,7 +50,5 @@ router.post('/change-password', (req, res) => {
   user.password = newPassword;
   res.status(200).json({ message: 'Password changed successfully' });
 });
-
-
 
 module.exports = router;
