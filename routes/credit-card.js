@@ -1,5 +1,6 @@
 const express = require("express");
 const { userAccountCollection, creditCardCollection } = require("..");
+const { ObjectId } = require("mongodb");
 const router = express.Router();
 
 router.post("/apply-credit-card", async (req, res) => {
@@ -27,5 +28,35 @@ router.get("/credit-card-requests", async(req,res)=>{
   const result = await creditCardCollection.find().toArray();
   res.send(result);
 })
+
+
+router.patch("/card-status/:id", async(req,res)=>{
+  const id = req.params.id;
+  const status = req.query.status;
+  const query = {_id: new ObjectId(id)};
+  const updateDoc = {
+    $set:{
+      status:status
+    }
+  }
+  const result = await creditCardCollection.updateOne(query,updateDoc);
+  res.send(result);
+})
+
+// handle feedback ---------
+router.put("/card-feedback/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const { feedback } = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      feedback: feedback,
+    },
+  };
+
+  const result = await creditCardCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
 
 module.exports = router;
