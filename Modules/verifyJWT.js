@@ -7,7 +7,7 @@ module.exports.verifyJWT = (req, res, next) => {
       .status(401)
       .send({ error: true, message: "unauthorized access" });
   }
-  // bearer token
+  // bearer token ------------
   const token = authorization.split(" ")[1];
 
   jwt.verify(token, process.env.WEB_TOKEN_SECRET, (err, decoded) => {
