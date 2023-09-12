@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const {blogsCollection}=require('../index')
+const {blogsCollection}=require('../index');
+const { ObjectId } = require('bson');
 
 
 router.post('/addBlogs',async(req,res)=>{
@@ -15,6 +16,15 @@ router.post('/addBlogs',async(req,res)=>{
     res.send(result)
 
 })
+router.delete("/deleteNews",async(req,res)=>{
+console.log(req.body.id)
+const id=req.body.id;
+const query={_id:new ObjectId (id)}
+const result=await blogsCollection.deleteOne(query)
+res.send(result)
+
+})
+
 
 
 
