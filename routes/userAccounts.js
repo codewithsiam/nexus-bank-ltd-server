@@ -155,6 +155,10 @@ router.patch("/status/:id", async (req, res) => {
 
     const nid_card_number = accountInfo.nid_card_number;
     const lastName = accountInfo.last_name;
+    const profileImage = accountInfo.profileImage;
+    const permanent_address = accountInfo?.permanent_address;
+    const date_of_birth = accountInfo?.date_of_birth;
+    const primaryEmail = accountInfo?.email;
 
     let updateDoc = {
       $set: {
@@ -191,9 +195,14 @@ router.patch("/status/:id", async (req, res) => {
 
         const newUser = {
           username: username,
-          nid_card_number: nid_card_number,
+          nid_card_number,
           status: "active",
-          password: hashedPassword, // Include the generated password
+          password: hashedPassword, 
+          profileImage , 
+          date_of_birth,
+          primaryEmail,
+          permanent_address,
+
 
           accounts: [
             {

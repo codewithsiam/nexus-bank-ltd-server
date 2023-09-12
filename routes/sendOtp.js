@@ -15,13 +15,13 @@ const generateAndStoreOTP = async (email) => {
     console.log(otp);
 
     const currentTime = new Date();
-    const expirationTime = new Date(currentTime.getTime() + 3 * 60 * 1000);
-    const expirationTimeString = new Date(expirationTime).toLocaleString();
+    const expirationTime = new Date(currentTime.getTime() + 10 * 60000);
+    // const expirationTimeString = new Date(expirationTime).toLocaleString();
 
     console.log(currentTime);
-    console.log(expirationTimeString);
+    console.log(expirationTime);
 
-    await optCollection.insertOne({ email, otp, expiresAt: expirationTimeString });
+    await optCollection.insertOne({ email, otp, expiresAt: expirationTime });
 
     return otp;
 };
@@ -29,7 +29,12 @@ const generateAndStoreOTP = async (email) => {
 // for verify otp and after that clear his all otp from the otp collection
 const verifyAndClearOTP = async (email, userEnteredOTP) => {
     console.log(email, userEnteredOTP)
-    const documents = await optCollection.find({ email }).sort({ expiresAt: -1 }).limit(1).toArray();
+    const documents = await optCollection
+    .find({ email })
+    .sort({ expiresAt: -1 }) // Sort by expiresAt in descending order
+    .limit(1)
+    .toArray();
+  
     const document = documents[0]; // Get the first (most recent) document
     console.log(document);
 
@@ -38,11 +43,13 @@ const verifyAndClearOTP = async (email, userEnteredOTP) => {
     }
 
     const currentTime = new Date().getTime();
-    const currentTimeString = new Date(currentTime).toLocaleString();
-    const expirationTimeString = new Date(document.expiresAt).toLocaleString();
+    // const currentTimeString = new Date(currentTime).toLocaleString();
+    // const expirationTimeString = new Date(document.expiresAt).toLocaleString();
+    const currentTimeString = new Date(currentTime);
+    const expirationTimeString = new Date(document.expiresAt);
 
-    console.log("Current Time:", new Date(currentTime).toLocaleString());
-    console.log("Expires At:", new Date(expirationTimeString).toLocaleString());
+    console.log("Current Time:", (currentTime));
+    console.log("Expires At:", (expirationTimeString));
 
     if (expirationTimeString < currentTimeString) {
         return { verified: false, message: "You have entered an expired OTP. Please resend." };
@@ -114,10 +121,10 @@ router.get('/send-otp', async (req, res) => {
 
 router.post('/verify-otp', async (req, res) => {
     const { accountNumber, email, otp } = req.query;
-console.log(
+    console.log(
 
-    'sdfsdkfj'
-)
+        'sdfsdkfj'
+    )
     try {
         // Validation - Check if either accountNumber or email and otp are provided
         if ((!accountNumber && !email) || !otp) {
@@ -139,7 +146,7 @@ console.log(
             // If an email is directly provided, use it
             userEmail = email;
         }
-console.log(userEmail);
+        console.log(userEmail);
         // Call the verifyAndClearOTP function
         const verificationResult = await verifyAndClearOTP(userEmail, otp);
 
