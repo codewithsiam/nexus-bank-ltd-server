@@ -61,7 +61,7 @@ router.post("/admin-login", async (req, res) => {
     const { username, password } = req.body;
     console.log("Username:", username);
 
-    const admin = await employeeCollection.findOne({ username: "siamadmin" });
+    const admin = await employeeCollection.findOne({ username: username });
     console.log("Admin from DB:", admin);
 
     if (!admin) {
