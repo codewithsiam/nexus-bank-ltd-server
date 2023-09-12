@@ -135,7 +135,7 @@ const generateUniqueAccountNumber = () => {
   const randomNumber = Math.floor(100000 + Math.random() * 900000);
 
   // Add a prefix to the random number (customize the prefix as needed)
-  const accountNumber = `ACCT${randomNumber}`;
+  const accountNumber = `NBL${randomNumber}`;
 
   return accountNumber;
 };
@@ -155,6 +155,10 @@ router.patch("/status/:id", async (req, res) => {
 
     const nid_card_number = accountInfo.nid_card_number;
     const lastName = accountInfo.last_name;
+    const profileImage = accountInfo.profileImage;
+    const permanent_address = accountInfo?.permanent_address;
+    const date_of_birth = accountInfo?.date_of_birth;
+    const primaryEmail = accountInfo?.email;
 
     let updateDoc = {
       $set: {
@@ -168,7 +172,7 @@ router.patch("/status/:id", async (req, res) => {
 
       if (!existingUser) {
         // User with the same NID card number does not exist, create a new user
-        let username = lastName;
+        let username = lastName.toLocaleLowerCase();
         let i = 1;
         while (true) {
           const potentialUsername = username + i;
@@ -191,9 +195,14 @@ router.patch("/status/:id", async (req, res) => {
 
         const newUser = {
           username: username,
-          nid_card_number: nid_card_number,
+          nid_card_number,
           status: "active",
-          password: hashedPassword, // Include the generated password
+          password: hashedPassword, 
+          profileImage , 
+          date_of_birth,
+          primaryEmail,
+          permanent_address,
+
 
           accounts: [
             {
