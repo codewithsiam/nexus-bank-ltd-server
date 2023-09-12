@@ -59,13 +59,15 @@ router.post("/user-login", async (req, res) => {
 router.post("/admin-login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username, password);
+    console.log("Username:", username);
 
-    const admin = await employeeCollection.findOne({ username });
-console.log(admin);
+    const admin = await employeeCollection.findOne({ username: "siamadmin" });
+    console.log("Admin from DB:", admin);
+
     if (!admin) {
       return res.status(401).json({ success: false, message: "Invalid admin credentials" });
     }
+
 
     if (!admin.password) {
       return res.status(401).json({ success: false, message: "Password not found for admin" });
