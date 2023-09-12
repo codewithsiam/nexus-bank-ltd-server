@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 // Import MongoDB connection and employee collection
 const { mongoClient, employeeCollection } = require("../index");
 const { sendEmail } = require("../Modules/emailSend");
+const { ObjectId } = require("mongodb");
 
 // Define employee routes
 router.get("/employees", async (req, res) => {
@@ -113,5 +114,13 @@ router.post("/add-employee", async (req, res) => {
         `;
   await sendEmail(employee.email, subject, htmlText);
 });
+
+// delete employee -----------
+router.patch('/delete-employee/:id', async(req,res)=>{
+  const id = req.params.id;
+  const query = {_id: new ObjectId(id)};
+  const result = await employeeCollection.deleteOne(query);
+  res.send(result);
+})
 
 module.exports = router;
