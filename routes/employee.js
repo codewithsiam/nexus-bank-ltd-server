@@ -121,6 +121,21 @@ router.patch('/delete-employee/:id', async(req,res)=>{
   const query = {_id: new ObjectId(id)};
   const result = await employeeCollection.deleteOne(query);
   res.send(result);
+});
+
+// employee designation change ------------------
+router.patch("/designation/:id", async(req,res)=>{
+  const id = req.params.id;
+  const designation = req.query.designation;
+  console.log(designation)
+  const query = {_id: new ObjectId(id)};
+  const updateDoc = {
+    $set:{
+      designation:designation
+    }
+  }
+  const result = await employeeCollection.updateOne(query,updateDoc);
+  res.send(result);
 })
 
 module.exports = router;

@@ -22,4 +22,10 @@ router.post("/apply-credit-card", async (req, res) => {
   res.send(result);
 });
 
+// get all credit card request 
+router.get("/credit-card-requests", async(req,res)=>{
+  const result = await creditCardCollection.find().toArray();
+  res.send(result);
+})
+
 module.exports = router;
