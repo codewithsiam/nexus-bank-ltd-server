@@ -25,6 +25,26 @@ res.send(result)
 
 })
 
+router.get('/news/:id',async(req,res)=>{
+    console.log(req.params.id)
+    const id=req.params.id;
+    const query={_id: new ObjectId(id)};
+    const result=await blogsCollection.findOne(query);
+    res.send(result)
+})
+router.patch('/updateBlogs/:id',async(req,res)=>{
+    const id=req.params.id;
+    const data=req.body; 
+    const options = { upsert: true }
+    const query={_id:new ObjectId(id)}
+    const updateDoc = {
+        $set: {
+         data
+        },
+      };
+      const result = await blogsCollection.updateOne(query, updateDoc, options);
+      res.send(result)
+})
 
 
 
