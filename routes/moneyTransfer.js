@@ -11,7 +11,7 @@ router.put('/money-transfer', async (req, res) => {
         console.log('Request Data:', data);
 
         // Sender account data
-        const senderFilter = { accountNumber: data?.senderAccountNumber };
+        const senderFilter = { accountNumber: data?.transferFromAccount };
         const senderAccount = await userAccountCollection.findOne(senderFilter);
         // console.log('Sender Account:', senderAccount);
 
@@ -24,7 +24,7 @@ router.put('/money-transfer', async (req, res) => {
         }
 
         // Receiver account data
-        const receiverFilter = { accountNumber: data?.receiverAccountNumber };
+        const receiverFilter = { accountNumber: data?.transferToAccount };
         const receiverAccount = await userAccountCollection.findOne(receiverFilter);
         // console.log('Receiver Account:', receiverAccount);
         if (!receiverAccount) {
@@ -43,7 +43,9 @@ router.put('/money-transfer', async (req, res) => {
             senderAccountNumber: senderAccount.accountNumber,
             receiverAccountNumber: receiverAccount.accountNumber,
             transferAmount: parseFloat(data.transferAmount),
-            transactionType: "transfer",
+            transactionType: data.transactionType,
+            reason: data?.reason,
+
         };
 
         const transactionData = await paymentCollection.insertOne(transaction);
@@ -64,15 +66,15 @@ router.put('/money-transfer', async (req, res) => {
     <title>Money Sent</title>
 </head>
 <body>
-    <h1>Money Sent</h1>
+    <h1>Money Sent Successfully</h1>
     <p>Hello ${senderAccount.first_name + " " + senderAccount.last_name},</p>
-    <p>You have successfully sent money to ${receiverAccount.first_name + receiverAccount.last_name} with the following details:</p>
+    <p>You have successfully sent money to ${receiverAccount.first_name + " " + receiverAccount.last_name} with the following details:</p>
     
     <ul>
         <li>Amount: ${parseFloat(data.transferAmount)}</li>
         <li>Date: ${transaction.time} </li>
         <li>Transaction ID: ${transactionId}</li>
-        <li>Sender Account:  ${senderAccount.accountNumber}</li>
+        <li>Receiver Account:  ${receiverAccount.accountNumber}</li>
         
     </ul>
 
@@ -101,7 +103,7 @@ router.put('/money-transfer', async (req, res) => {
     <li>Amount: ${parseFloat(data.transferAmount)}</li>
     <li>Date: ${transaction.time} </li>
     <li>Transaction ID: ${transactionId}</li>
-    <li>Receiver Account Number: ${receiverAccount.accountNumber}</li>
+    <li>Sender Account Number: ${senderAccount.accountNumber}</li>
     </ul>
 
     <p>Thank you for using our services.</p>

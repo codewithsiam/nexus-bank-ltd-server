@@ -144,12 +144,11 @@ router.post('/change-password', verifyJWT, async (req, res) => {
     const { oldPassword, newPassword, isAdmin } = req.body;
     const username = req.decoded.username;
 
-    let user = null; // Initialize user to null
-
+    let user = null; 
     if (isAdmin) {
-      user = await employeeCollection.findOne({ username }); // Use employeeCollection for admin
+      user = await employeeCollection.findOne({ username }); 
     } else {
-      user = await usersCollection.findOne({ username }); // Use usersCollection for regular users
+      user = await usersCollection.findOne({ username }); 
     }
 
     if (!user) {

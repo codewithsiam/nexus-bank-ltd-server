@@ -30,11 +30,11 @@ const generateAndStoreOTP = async (email) => {
 const verifyAndClearOTP = async (email, userEnteredOTP) => {
     console.log(email, userEnteredOTP)
     const documents = await optCollection
-    .find({ email })
-    .sort({ expiresAt: -1 }) // Sort by expiresAt in descending order
-    .limit(1)
-    .toArray();
-  
+        .find({ email })
+        .sort({ expiresAt: -1 }) // Sort by expiresAt in descending order
+        .limit(1)
+        .toArray();
+
     const document = documents[0]; // Get the first (most recent) document
     console.log(document);
 
@@ -42,18 +42,18 @@ const verifyAndClearOTP = async (email, userEnteredOTP) => {
         return { verified: false, message: "OTP not found. Please request a new one." };
     }
 
-    const currentTime = new Date().getTime();
-    // const currentTimeString = new Date(currentTime).toLocaleString();
-    // const expirationTimeString = new Date(document.expiresAt).toLocaleString();
-    const currentTimeString = new Date(currentTime);
-    const expirationTimeString = new Date(document.expiresAt);
+    // const currentTime = new Date().getTime();
+    // // const currentTimeString = new Date(currentTime).toLocaleString();
+    // // const expirationTimeString = new Date(document.expiresAt).toLocaleString();
+    // const currentTimeString = new Date(currentTime);
+    // const expirationTimeString = new Date(document.expiresAt);
 
-    console.log("Current Time:", (currentTime));
-    console.log("Expires At:", (expirationTimeString));
+    // console.log("Current Time:", (currentTimeString));
+    // console.log("Expires At:", (expirationTimeString));
 
-    if (expirationTimeString < currentTimeString) {
-        return { verified: false, message: "You have entered an expired OTP. Please resend." };
-    }
+    // if (expirationTimeString < currentTimeString) {
+    //     return { verified: false, message: "You have entered an expired OTP. Please resend." };
+    // }
 
     if (parseFloat(document.otp) === parseFloat(userEnteredOTP)) { //ensure that the otp is a number
         await optCollection.deleteMany({ email });
@@ -121,10 +121,7 @@ router.get('/send-otp', async (req, res) => {
 
 router.post('/verify-otp', async (req, res) => {
     const { accountNumber, email, otp } = req.query;
-    console.log(
-
-        'sdfsdkfj'
-    )
+    console.log("sdfsdf",req.query);
     try {
         // Validation - Check if either accountNumber or email and otp are provided
         if ((!accountNumber && !email) || !otp) {
