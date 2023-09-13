@@ -7,14 +7,14 @@ var morgan = require("morgan");
 
 
 // socket io connect start
-const http=require('http')
+const http = require('http')
 
-const {Server}=require('socket.io')
+const { Server } = require('socket.io')
 
-const server=http.createServer(app)
-exports.io= new Server(server , {
-  cors:{
-      origin:"*"
+const server = http.createServer(app)
+exports.io = new Server(server, {
+  cors: {
+    origin: "*"
   }
 })
 
@@ -77,6 +77,7 @@ exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
 exports.creditCardCollection = client.db("nexusBankDB").collection("creditCardCollection")
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
+exports.customerCollection = client.db("nexusBankDB").collection("support")
 
 
 // Routes-------------------
@@ -90,9 +91,13 @@ const userAccounts = require("./routes/userAccounts")
 const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
+const sendOtp = require("./routes/sendOtp")
+const blogs = require("./routes/blog")
+const customerSupport = require('./routes/customer')
 const sendOtp = require("./routes/sendOtp");
 const creditCardRoute = require("./routes/credit-card")
 const blogs=require("./routes/blog")
+
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -107,6 +112,8 @@ app.use(profile);
 app.use(sendOtp);
 app.use(creditCardRoute);
 app.use(blogs)
+app.use(customerSupport)
+
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
