@@ -15,12 +15,17 @@ router.put('/money-transfer', async (req, res) => {
         const senderAccount = await userAccountCollection.findOne(senderFilter);
         // console.log('Sender Account:', senderAccount);
 
+        // own account validate 
+        if (data.transferToAccount == data?.transferFromAccount) {
+            res.send({ success: false, message: 'Sender account and receiver account are same' });
+        }
+
         if (!senderAccount) {
-            return res.status(404).send({ message: 'Sender account not found' });
+            return res.send({ message: 'Sender account not found' });
         }
         // balance validation 
         if (senderAccount.balance <= 0 || senderAccount.balance < data.transferAmount) {
-            return res.status(404).send({ message: 'Unsufficient Balance' });
+            return res.send({ message: 'Unsufficient Balance' });
         }
 
         // Receiver account data
@@ -28,11 +33,17 @@ router.put('/money-transfer', async (req, res) => {
         const receiverAccount = await userAccountCollection.findOne(receiverFilter);
         // console.log('Receiver Account:', receiverAccount);
         if (!receiverAccount) {
-            return res.status(404).send({ message: 'Receiver account not found' });
+            return res.send({ message: 'Receiver account not found' });
         }
+
+
+
         // sender balance reduce 
         const senderNewBalance = parseFloat(senderAccount.balance) - parseFloat(data.transferAmount);
         await userAccountCollection.updateOne(senderFilter, { $set: { balance: senderNewBalance } });
+
+
+
         // add balance to receiverAccount 
         const receiverNewBalance = parseFloat(receiverAccount.balance) + parseFloat(data.transferAmount);
         await userAccountCollection.updateOne(receiverFilter, { $set: { balance: receiverNewBalance } });
@@ -55,8 +66,8 @@ router.put('/money-transfer', async (req, res) => {
 
 
         // send email to sender and receiver 
-        const senderSubject = `You Received Money From ACCOUNT: ${senderAccount.accountNumber} `;
-        const receiverSubject = `You Send Money To ACCOUNT: ${receiverAccount.accountNumber} `;
+        const receiverSubject = `You Received Money From ACCOUNT: ${senderAccount.accountNumber} `;
+        const senderSubject = `You Send Money To ACCOUNT: ${receiverAccount.accountNumber} `;
         const senderHtmlText = `
         <!DOCTYPE html>
 <html lang="en">
@@ -119,7 +130,7 @@ router.put('/money-transfer', async (req, res) => {
 
 
 
-        res.send({ success: true, message: 'Money transfer successful' });
+        res.send({ success: true, message: 'Money transfer successful', transactionId });
 
     } catch (error) {
         console.error('Error:', error);

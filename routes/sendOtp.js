@@ -80,7 +80,7 @@ router.get('/send-otp', async (req, res) => {
             const user = await userAccountCollection.findOne({ accountNumber });
 
             if (!user) {
-                return res.status(404).json({ success: false, message: "User not found" });
+                return res.json({ success: false, message: "User not found" });
             }
 
             userEmail = user.email;
@@ -125,7 +125,7 @@ router.post('/verify-otp', async (req, res) => {
     try {
         // Validation - Check if either accountNumber or email and otp are provided
         if ((!accountNumber && !email) || !otp) {
-            return res.status(400).json({ status: false, message: "Account number or email or otp is missing" });
+            return res.json({ status: false, message: "Account number or email or otp is missing" });
         }
 
         let userEmail;
@@ -135,7 +135,7 @@ router.post('/verify-otp', async (req, res) => {
             const user = await userAccountCollection.findOne({ accountNumber });
 
             if (!user) {
-                return res.status(404).json({ status: false, message: "User not found" });
+                return res.json({ status: false, message: "User not found" });
             }
 
             userEmail = user.email;
@@ -150,7 +150,7 @@ router.post('/verify-otp', async (req, res) => {
         if (verificationResult.verified === true) {
             return res.status(200).json({ verified: true, message: 'OTP is valid.' });
         } else {
-            return res.status(400).json(verificationResult);
+            return res.json(verificationResult);
         }
     } catch (error) {
         console.error(error);
