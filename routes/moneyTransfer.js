@@ -1,4 +1,5 @@
 const express = require('express');
+const { ObjectId } = require('mongodb');
 const router = express.Router();
 
 const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
@@ -123,5 +124,10 @@ router.put('/money-transfer', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+router.get('/money-transfer', async (req, res) => {
+    const result = await paymentCollection.find({}).toArray();
+    res.send(result)
+})
 
 module.exports = router;
