@@ -179,6 +179,42 @@ router.post('/change-password', verifyJWT, async (req, res) => {
   }
 });
 
+// password change 
+router.post('/change-password', verifyJWT, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await usersCollection.findOne({ username: req.decoded.username });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Incorrect old password' });
+    }
+    const isOldPassword = await bcrypt.compare(newPassword, user.password);
+
+
+    if (isOldPassword) {
+      return res.status(401).json({ success: false, message: 'Your old password and new password are same, Please try another one' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await usersCollection.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
+
+    res.status(200).json({ success: true, message: 'Password changed' });
+  } catch (error) {
+    console.error('Error in /change-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An internal server error occurred while changing the password.',
+    });
+  }
+});
 
 // account number to email getting api 
 router.get('/account-to-email', async (req, res) => {

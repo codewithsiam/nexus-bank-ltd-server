@@ -58,7 +58,7 @@ router.patch("/add-beneficiary", async (req, res) => {
 
     if (!currentAccount) {
       // If the account doesn't exist, send an error response
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ error: "Account is not found" });
     }
 
     const existingUser = await usersCollection.findOne({
