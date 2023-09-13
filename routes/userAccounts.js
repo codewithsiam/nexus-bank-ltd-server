@@ -116,25 +116,25 @@ router.get("/approved-accounts", async (req, res) => {
 
 router.get('/current-user-account', async (req, res) => {
   const filter = 'Current Account'
-  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
   res.send(result)
 })
 
-router.get('/deposit-user-account', async(req,res)=>{
+router.get('/deposit-user-account', async (req, res) => {
   const filter = 'Deposit Account';
-  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
   res.send(result)
 })
 
-router.get('/saving-user-account', async(req,res)=>{
+router.get('/saving-user-account', async (req, res) => {
   const filter = 'Saving Account';
-  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
   res.send(result)
 })
 
-router.get('/student-user-account', async(req,res)=>{
+router.get('/student-user-account', async (req, res) => {
   const filter = 'Student Account';
-  const result = await userAccountCollection.find({account_type:filter}).toArray()
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
   res.send(result)
 })
 
