@@ -114,13 +114,7 @@ router.post("/ssl-payment", (req, res) => {
         res.send({url: GatewayPageURL})
         console.log('Redirecting to: ', GatewayPageURL)
     });
-  
-  
-    
-    
-  
   });
-  
   
   
   router.post('/payment-status/:tranId', async(req, res) => {
