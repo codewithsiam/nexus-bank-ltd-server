@@ -73,6 +73,8 @@ exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
 exports.optCollection = client.db("nexusBankDB").collection("otps");
+exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
+exports.creditCardCollection = client.db("nexusBankDB").collection("creditCardCollection")
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
 exports.customerCollection = client.db("nexusBankDB").collection("support")
@@ -92,6 +94,10 @@ const profile = require("./routes/profile")
 const sendOtp = require("./routes/sendOtp")
 const blogs = require("./routes/blog")
 const customerSupport = require('./routes/customer')
+const sendOtp = require("./routes/sendOtp");
+const creditCardRoute = require("./routes/credit-card")
+const blogs=require("./routes/blog")
+
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -104,6 +110,7 @@ app.use(moneyTransfer);
 app.use(userAccounts);
 app.use(profile);
 app.use(sendOtp);
+app.use(creditCardRoute);
 app.use(blogs)
 app.use(customerSupport)
 
