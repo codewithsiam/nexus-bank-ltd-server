@@ -92,9 +92,7 @@ const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
 const sendOtp = require("./routes/sendOtp")
-const blogs = require("./routes/blog")
 const customerSupport = require('./routes/customer')
-const sendOtp = require("./routes/sendOtp");
 const creditCardRoute = require("./routes/credit-card")
 const blogs=require("./routes/blog")
 
