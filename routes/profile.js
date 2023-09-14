@@ -20,15 +20,17 @@ router.patch("/update-Profile/:id", async (req, res) => {
     // const options = { upsert: true };
     const updateDoc = {
       $set: {
-        nationality: body.nationality,
+        nick_name: body.nick_name,
+        name: body.name,
+        profession: body.profession,
+        email: body.email,
         birthday: body.birthday,
         gender: body.gender,
-        profession: body.profession,
         number: body.number,
+        nationality: body.nationality,
         description: body.description,
-        nickname: body.nickName,
-        presentAddress: body.presentAddress,
-        permanentAddress: body.permanentAddress
+        present_address: body.present_address,
+        permanent_address: body.permanent_address
       },
     };
 
