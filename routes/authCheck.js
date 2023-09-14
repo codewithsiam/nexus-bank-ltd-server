@@ -16,11 +16,11 @@ router.post("/user-login", async (req, res) => {
     const user = await usersCollection.findOne({ username });
 
     if (!user) {
-      return res.status(401).json({ success: false, message: "Invalid user credentials" });
+      return res.json({ success: false, message: "Invalid user credentials" });
     }
 
     if (!user.password) {
-      return res.status(401).json({ success: false, message: "Password not found for user" });
+      return res.json({ success: false, message: "Password not found for user" });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
@@ -42,7 +42,7 @@ router.post("/user-login", async (req, res) => {
         token: token,
       });
     } else {
-      return res.status(401).json({
+      return res.json({
         success: false,
         message: "Passwords do not match",
       });
@@ -193,13 +193,13 @@ router.post('/change-password', verifyJWT, async (req, res) => {
 
 
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Incorrect old password' });
+      return res.json({ success: false, message: 'Incorrect old password' });
     }
     const isOldPassword = await bcrypt.compare(newPassword, user.password);
 
 
     if (isOldPassword) {
-      return res.status(401).json({ success: false, message: 'Your old password and new password are same, Please try another one' });
+      return res.json({ success: false, message: 'Your old password and new password are same, Please try another one' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

@@ -300,7 +300,7 @@ router.patch("/status/:id", async (req, res) => {
 
         await sendEmail(email, subject, htmlText);
 
-        res.status(201).send(insertResult);
+        res.status(200).send({ success: true, message: "User created successfully", insertResult});
       } else {
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
@@ -384,7 +384,7 @@ router.patch("/status/:id", async (req, res) => {
         `;
         await sendEmail(email, subject, htmlText);
 
-        res.send(result);
+        res.send({ success: true, message: "Account created successfully" , result});
       }
     } else {
       // Update the status in the userAccountCollection
