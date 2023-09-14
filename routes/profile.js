@@ -6,7 +6,6 @@ const { ObjectId } = require("mongodb");
 const { userAccountCollection , usersCollection} = require('../index');
 
 // .........update user profile data............
-
 router.patch("/update-Profile/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -46,19 +45,25 @@ router.patch("/update-Profile/:id", async (req, res) => {
   }
 });
 
-// Endpoint for changing the password
-// router.post('/change-password', (req, res) => {
-//   const { oldPassword, newPassword } = req.body;
+// .........update user profile data............
+router.patch("/update-image/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const body = req.body;
+    // const imageInfo = await usersCollection.findOne(query);
+    // if (!imageInfo) {
+    //   return res.status(404).json({ error: 'Image is not found' });
+    // }
 
-//   // Replace this with your actual user authentication logic
-//   const user = usersCollection.find((inputPass) => inputPass.password === oldPassword);
-//   if (!user) {
-//     return res.status(401).json({ error: 'Invalid old password' });
-//   }
+    // const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        image: body.image,
+      },
+    };
 
-//   // Update the user's password with the new password
-//   user.password = newPassword;
-//   res.status(200).json({ message: 'Password changed successfully' });
-// });
+    const result = await usersCollection.updateOne(query, updateDoc);
+    res.send(result);
+});
 
 module.exports = router;
