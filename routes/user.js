@@ -109,6 +109,7 @@ router.patch('/addcardbeneficiary',async (req,res)=>{
     account_number:data.account,
     phone:data.phone,
     email:data.email,
+    id:data.id
   };
   if (!Array.isArray(existingUser.AddCardBeneficiary)) {
     existingUser.AddCardBeneficiary = [];
@@ -120,6 +121,25 @@ router.patch('/addcardbeneficiary',async (req,res)=>{
   const result = await usersCollection.updateOne(query1, updateDoc);
   res.send(result);
   
+})
+//get Card Beneficiary
+router.get('/CardBeneficiary',async(req,res)=>{
+  const userName=req.query.useName;
+  console.log(userName)
+  const query={username:userName}
+  const result=await usersCollection.findOne(query)
+  res.send(result.AddCardBeneficiary)
+})
+
+//delete card beneficiary
+router.delete('/deleteBeneficiary/:id',async(req,res)=>{
+  const id=req.params.id;
+  const username= req.query.username;
+  const query={username:username}
+  const updateDoc={ $pull: { AddCardBeneficiary: { id: id } }}
+  const result=await usersCollection.updateOne(query,updateDoc);
+  res.send(result)
+
 })
 
 // get beneficiary list -----------
