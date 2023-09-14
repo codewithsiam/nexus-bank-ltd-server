@@ -7,14 +7,14 @@ var morgan = require("morgan");
 
 
 // socket io connect start
-const http=require('http')
+const http = require('http')
 
-const {Server}=require('socket.io')
+const { Server } = require('socket.io')
 
-const server=http.createServer(app)
-exports.io= new Server(server , {
-  cors:{
-      origin:"*"
+const server = http.createServer(app)
+exports.io = new Server(server, {
+  cors: {
+    origin: "*"
   }
 })
 
@@ -33,7 +33,7 @@ app.use(express.json());
 // import nice
 // const userRoutes = require('./routes/user')
 
-const uri = `mongodb+srv://nexusUser:lnH874OdCzf23YTu@cluster0.13jglcb.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.13jglcb.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -73,8 +73,11 @@ exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
 exports.optCollection = client.db("nexusBankDB").collection("otps");
+exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
+exports.creditCardCollection = client.db("nexusBankDB").collection("creditCardCollection")
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
+exports.customerCollection = client.db("nexusBankDB").collection("support")
 
 
 // Routes-------------------
@@ -89,7 +92,10 @@ const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
 const sendOtp = require("./routes/sendOtp")
+const customerSupport = require('./routes/customer')
+const creditCardRoute = require("./routes/credit-card")
 const blogs=require("./routes/blog")
+
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -102,7 +108,10 @@ app.use(moneyTransfer);
 app.use(userAccounts);
 app.use(profile);
 app.use(sendOtp);
+app.use(creditCardRoute);
 app.use(blogs)
+app.use(customerSupport)
+
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");

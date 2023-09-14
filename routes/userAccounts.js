@@ -114,6 +114,30 @@ router.get("/approved-accounts", async (req, res) => {
   res.send(result);
 });
 
+router.get('/current-user-account', async (req, res) => {
+  const filter = 'Current Account'
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/deposit-user-account', async (req, res) => {
+  const filter = 'Deposit Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/saving-user-account', async (req, res) => {
+  const filter = 'Saving Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/student-user-account', async (req, res) => {
+  const filter = 'Student Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
 // ----------------------------------------------------------------------//
 // ------------------------- account create/ update --------------------//
 // ----------------------------------------------------------------------//
@@ -155,6 +179,10 @@ router.patch("/status/:id", async (req, res) => {
 
     const nid_card_number = accountInfo.nid_card_number;
     const lastName = accountInfo.last_name;
+    const profileImage = accountInfo.profileImage;
+    const permanent_address = accountInfo?.permanent_address;
+    const date_of_birth = accountInfo?.date_of_birth;
+    const primaryEmail = accountInfo?.email;
 
     let updateDoc = {
       $set: {
@@ -191,9 +219,14 @@ router.patch("/status/:id", async (req, res) => {
 
         const newUser = {
           username: username,
-          nid_card_number: nid_card_number,
+          nid_card_number,
           status: "active",
-          password: hashedPassword, // Include the generated password
+          password: hashedPassword, 
+          profileImage , 
+          date_of_birth,
+          primaryEmail,
+          permanent_address,
+
 
           accounts: [
             {
@@ -269,7 +302,6 @@ router.patch("/status/:id", async (req, res) => {
 
         res.status(201).send(insertResult);
       } else {
-
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
 
@@ -297,7 +329,7 @@ router.patch("/status/:id", async (req, res) => {
           $set: {
             status: "approved",
             balance: 0,
-            accountNumber
+            accountNumber,
           },
         };
         await userAccountCollection.updateOne(
@@ -390,15 +422,16 @@ router.put("/feedback/:id", async (req, res) => {
   res.send(result);
 });
 
-
 router.get("/myAccounts", async (req, res) => {
   const { nidNumber } = req.query;
   if (!nidNumber) {
     return res.send({ success: false, message: "Nid number not valid" });
   }
-  const accounts = await userAccountCollection.find({ nid_card_number: nidNumber }).toArray();
+  const accounts = await userAccountCollection
+    .find({ nid_card_number: nidNumber })
+    .toArray();
   return res.send(accounts);
-})
+});
 
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;
@@ -438,14 +471,12 @@ router.post("/create-deposit-account", async (req, res) => {
   // console.log("426", interestRateAndMaturityValue)
 
   if (interestRateAndMaturityValue) {
-    
     const interestRate = interestRateAndMaturityValue.interestRate;
     const maturityValue = interestRateAndMaturityValue.maturityValue;
     account.interestRate = interestRate;
     account.maturityValue = maturityValue;
     const result = await userAccountCollection.insertOne(account);
     res.send(result);
-
   } else {
     res.json({
       message: "Data not found for the selected amount and years.",

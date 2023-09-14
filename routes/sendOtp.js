@@ -15,13 +15,13 @@ const generateAndStoreOTP = async (email) => {
     console.log(otp);
 
     const currentTime = new Date();
-    const expirationTime = new Date(currentTime.getTime() + 3 * 60 * 1000);
-    const expirationTimeString = new Date(expirationTime).toLocaleString();
+    const expirationTime = new Date(currentTime.getTime() + 10 * 60000);
+    // const expirationTimeString = new Date(expirationTime).toLocaleString();
 
     console.log(currentTime);
-    console.log(expirationTimeString);
+    console.log(expirationTime);
 
-    await optCollection.insertOne({ email, otp, expiresAt: expirationTimeString });
+    await optCollection.insertOne({ email, otp, expiresAt: expirationTime });
 
     return otp;
 };
@@ -29,7 +29,12 @@ const generateAndStoreOTP = async (email) => {
 // for verify otp and after that clear his all otp from the otp collection
 const verifyAndClearOTP = async (email, userEnteredOTP) => {
     console.log(email, userEnteredOTP)
-    const documents = await optCollection.find({ email }).sort({ expiresAt: -1 }).limit(1).toArray();
+    const documents = await optCollection
+        .find({ email })
+        .sort({ expiresAt: -1 }) // Sort by expiresAt in descending order
+        .limit(1)
+        .toArray();
+
     const document = documents[0]; // Get the first (most recent) document
     console.log(document);
 
@@ -37,16 +42,18 @@ const verifyAndClearOTP = async (email, userEnteredOTP) => {
         return { verified: false, message: "OTP not found. Please request a new one." };
     }
 
-    const currentTime = new Date().getTime();
-    const currentTimeString = new Date(currentTime).toLocaleString();
-    const expirationTimeString = new Date(document.expiresAt).toLocaleString();
+    // const currentTime = new Date().getTime();
+    // // const currentTimeString = new Date(currentTime).toLocaleString();
+    // // const expirationTimeString = new Date(document.expiresAt).toLocaleString();
+    // const currentTimeString = new Date(currentTime);
+    // const expirationTimeString = new Date(document.expiresAt);
 
-    console.log("Current Time:", new Date(currentTime).toLocaleString());
-    console.log("Expires At:", new Date(expirationTimeString).toLocaleString());
+    // console.log("Current Time:", (currentTimeString));
+    // console.log("Expires At:", (expirationTimeString));
 
-    if (expirationTimeString < currentTimeString) {
-        return { verified: false, message: "You have entered an expired OTP. Please resend." };
-    }
+    // if (expirationTimeString < currentTimeString) {
+    //     return { verified: false, message: "You have entered an expired OTP. Please resend." };
+    // }
 
     if (parseFloat(document.otp) === parseFloat(userEnteredOTP)) { //ensure that the otp is a number
         await optCollection.deleteMany({ email });
@@ -73,7 +80,7 @@ router.get('/send-otp', async (req, res) => {
             const user = await userAccountCollection.findOne({ accountNumber });
 
             if (!user) {
-                return res.status(404).json({ success: false, message: "User not found" });
+                return res.json({ success: false, message: "User not found" });
             }
 
             userEmail = user.email;
@@ -114,14 +121,11 @@ router.get('/send-otp', async (req, res) => {
 
 router.post('/verify-otp', async (req, res) => {
     const { accountNumber, email, otp } = req.query;
-console.log(
-
-    'sdfsdkfj'
-)
+    console.log("sdfsdf",req.query);
     try {
         // Validation - Check if either accountNumber or email and otp are provided
         if ((!accountNumber && !email) || !otp) {
-            return res.status(400).json({ status: false, message: "Account number or email or otp is missing" });
+            return res.json({ status: false, message: "Account number or email or otp is missing" });
         }
 
         let userEmail;
@@ -131,7 +135,7 @@ console.log(
             const user = await userAccountCollection.findOne({ accountNumber });
 
             if (!user) {
-                return res.status(404).json({ status: false, message: "User not found" });
+                return res.json({ status: false, message: "User not found" });
             }
 
             userEmail = user.email;
@@ -139,14 +143,14 @@ console.log(
             // If an email is directly provided, use it
             userEmail = email;
         }
-console.log(userEmail);
+        console.log(userEmail);
         // Call the verifyAndClearOTP function
         const verificationResult = await verifyAndClearOTP(userEmail, otp);
 
         if (verificationResult.verified === true) {
             return res.status(200).json({ verified: true, message: 'OTP is valid.' });
         } else {
-            return res.status(400).json(verificationResult);
+            return res.json(verificationResult);
         }
     } catch (error) {
         console.error(error);

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 
+
 const { userAccountCollection , usersCollection} = require('../index');
 
 // .........update user profile data............
@@ -46,18 +47,18 @@ router.patch("/update-Profile/:id", async (req, res) => {
 });
 
 // Endpoint for changing the password
-router.post('/change-password', (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+// router.post('/change-password', (req, res) => {
+//   const { oldPassword, newPassword } = req.body;
 
-  // Replace this with your actual user authentication logic
-  const user = userAccountCollection.find((inputPass) => inputPass.password === oldPassword);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid old password' });
-  }
+//   // Replace this with your actual user authentication logic
+//   const user = usersCollection.find((inputPass) => inputPass.password === oldPassword);
+//   if (!user) {
+//     return res.status(401).json({ error: 'Invalid old password' });
+//   }
 
-  // Update the user's password with the new password
-  user.password = newPassword;
-  res.status(200).json({ message: 'Password changed successfully' });
-});
+//   // Update the user's password with the new password
+//   user.password = newPassword;
+//   res.status(200).json({ message: 'Password changed successfully' });
+// });
 
 module.exports = router;

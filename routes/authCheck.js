@@ -8,104 +8,173 @@ const { mongoClient, employeeCollection, usersCollection, userAccountCollection 
 
 
 // Login route
-router.post("/login", async (req, res) => {
+router.post("/user-login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username, password); 
-
+    console.log(username, password);
 
     const user = await usersCollection.findOne({ username });
 
-
     if (!user) {
-      const employee = await employeeCollection.findOne({ username });
+      return res.status(401).json({ success: false, message: "Invalid user credentials" });
+    }
 
-      if (!employee) {
-        return res.status(401).json({  success: false, message: "Invalid credentials" });
-      }
+    if (!user.password) {
+      return res.status(401).json({ success: false, message: "Password not found for user" });
+    }
 
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-      if (!employee.password) {
-        return res.status(401).json({ success: false, message: "Password not found for employee" });
-      }
-
-
-      const isPasswordMatch = await bcrypt.compare(password, employee.password);
-
-      if (isPasswordMatch) {
-        const token = jwt.sign(
-          { username: employee.username },
-          process.env.WEB_TOKEN_SECRET,
-          {
-            expiresIn: "1d",
-          }
-        );
-
-        return res.status(200).json({
-          success: true,
-          message: "Login successful",
-          result: employee,
-          isAdmin: true,
-          token: token,
-        });
-      } else {
-        return res.status(401).json({
-          success: false,
-          message: "Passwords do not match",
-        });
-      }
-    } else {
-
-      if (!user.password) {
-        return res.status(401).json({ error: true, message: "Password not found for user" });
-      }
-
-
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-      if (isPasswordMatch) {
-        const token = jwt.sign({ username: user.username }, process.env.WEB_TOKEN_SECRET, {
+    if (isPasswordMatch) {
+      const token = jwt.sign(
+        { username: user.username },
+        process.env.WEB_TOKEN_SECRET,
+        {
           expiresIn: "1d",
-        });
+        }
+      );
 
-        return res.status(200).json({
-          success: true,
-          message: "Login successful",
-          result: user,
-          token: token,
-          isAdmin: false,
-        });
-      } else {
-        return res.status(401).json({
-          success: false,
-          message: "Passwords do not match",
-        });
-      }
+      return res.status(200).json({
+        success: true,
+        message: "User login successful",
+        result: user,
+        isAdmin: false,
+        token: token,
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "Passwords do not match",
+      });
     }
   } catch (error) {
     return res.status(500).json({
-      error: true,
+      success: false,
       message: error.message,
     });
   }
 });
 
+// Define a route for admin login
+router.post("/admin-login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    console.log("Username:", username);
+
+    const admin = await employeeCollection.findOne({ username: username });
+    console.log("Admin from DB:", admin);
+
+    if (!admin) {
+      return res.status(401).json({ success: false, message: "Invalid admin credentials" });
+    }
+
+
+    if (!admin.password) {
+      return res.status(401).json({ success: false, message: "Password not found for admin" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, admin.password);
+
+    if (isPasswordMatch) {
+      const token = jwt.sign(
+        { username: admin.username },
+        process.env.WEB_TOKEN_SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Admin login successful",
+        result: admin,
+        isAdmin: true,
+        token: token,
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "Passwords do not match",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
+
+
+
 // Profile route (protected with JWT authentication)
-router.get("/user/profile", verifyJWT, async (req, res) => {
+router.get("/profileMonitor", verifyJWT, async (req, res) => {
   try {
     const username = req.decoded.username;
 
     const user = await usersCollection.findOne({ username });
 
     if (!user) {
+      const employee = await employeeCollection.findOne({ username });
+      if (employee) {
+        return res.status(200).json({
+          success: true,
+          result: employee,
+          isAdmin: true,
+        });
+      }
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, result: user });
+    res.status(200).json({ success: true, result: user, isAdmin: false });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
+      isAdmin: false,
+    });
+  }
+});
+
+// password change 
+router.post('/change-password', verifyJWT, async (req, res) => {
+  try {
+    const { oldPassword, newPassword, isAdmin } = req.body;
+    const username = req.decoded.username;
+
+    let user = null; 
+    if (isAdmin) {
+      user = await employeeCollection.findOne({ username }); 
+    } else {
+      user = await usersCollection.findOne({ username }); 
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Incorrect old password' });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(401).json({ success: false, message: 'Your old password and new password are the same. Please try another one' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await (isAdmin ? employeeCollection : usersCollection).updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
+
+    res.status(200).json({ success: true, message: 'Password changed' });
+  } catch (error) {
+    console.error('Error in /change-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An internal server error occurred while changing the password.',
     });
   }
 });
