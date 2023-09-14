@@ -30,7 +30,8 @@ router.patch("/update-Profile/:id", async (req, res) => {
         nationality: body.nationality,
         description: body.description,
         present_address: body.present_address,
-        permanent_address: body.permanent_address
+        permanent_address: body.permanent_address,
+        img: body.img
       },
     };
 
@@ -43,27 +44,6 @@ router.patch("/update-Profile/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
-
-// .........update user profile data............
-router.patch("/update-image/:id", async (req, res) => {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const body = req.body;
-    // const imageInfo = await usersCollection.findOne(query);
-    // if (!imageInfo) {
-    //   return res.status(404).json({ error: 'Image is not found' });
-    // }
-
-    // const options = { upsert: true };
-    const updateDoc = {
-      $set: {
-        image: body.image,
-      },
-    };
-
-    const result = await usersCollection.updateOne(query, updateDoc);
-    res.send(result);
 });
 
 module.exports = router;
