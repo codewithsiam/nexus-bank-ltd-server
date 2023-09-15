@@ -6,7 +6,6 @@ const { ObjectId } = require("mongodb");
 const { userAccountCollection , usersCollection} = require('../index');
 
 // .........update user profile data............
-
 router.patch("/update-Profile/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -31,7 +30,8 @@ router.patch("/update-Profile/:id", async (req, res) => {
         nationality: body.nationality,
         description: body.description,
         present_address: body.present_address,
-        permanent_address: body.permanent_address
+        permanent_address: body.permanent_address,
+        img: body.img
       },
     };
 
@@ -45,20 +45,5 @@ router.patch("/update-Profile/:id", async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Endpoint for changing the password
-// router.post('/change-password', (req, res) => {
-//   const { oldPassword, newPassword } = req.body;
-
-//   // Replace this with your actual user authentication logic
-//   const user = usersCollection.find((inputPass) => inputPass.password === oldPassword);
-//   if (!user) {
-//     return res.status(401).json({ error: 'Invalid old password' });
-//   }
-
-//   // Update the user's password with the new password
-//   user.password = newPassword;
-//   res.status(200).json({ message: 'Password changed successfully' });
-// });
 
 module.exports = router;
