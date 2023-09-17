@@ -58,7 +58,7 @@ router.patch("/add-beneficiary", async (req, res) => {
 
     if (!currentAccount) {
       // If the account doesn't exist, send an error response
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ error: "Account is not found" });
     }
 
     const existingUser = await usersCollection.findOne({
@@ -89,6 +89,58 @@ router.patch("/add-beneficiary", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//add card beneficiary
+router.patch('/addcardbeneficiary',async (req,res)=>{
+  const name=(req.query.userName)
+  const data=req.body;
+  const query={username:name}
+  const options = { upsert: true };
+  let updateDoc = {
+    $set: {
+      status: "active",
+    },
+  };
+  const existingUser = await usersCollection.findOne({
+    username: name,
+  });
+  const newBeneficiary = {
+    name: data.name,
+    account_number:data.account,
+    phone:data.phone,
+    email:data.email,
+    id:data.id
+  };
+  if (!Array.isArray(existingUser.AddCardBeneficiary)) {
+    existingUser.AddCardBeneficiary = [];
+  }
+  existingUser.AddCardBeneficiary.push(newBeneficiary);
+
+  updateDoc.$set.AddCardBeneficiary = existingUser.AddCardBeneficiary;
+  const query1 = { username: existingUser.username };
+  const result = await usersCollection.updateOne(query1, updateDoc);
+  res.send(result);
+  
+})
+//get Card Beneficiary
+router.get('/CardBeneficiary',async(req,res)=>{
+  const userName=req.query.useName;
+  console.log(userName)
+  const query={username:userName}
+  const result=await usersCollection.findOne(query)
+  res.send(result.AddCardBeneficiary)
+})
+
+//delete card beneficiary
+router.delete('/deleteBeneficiary/:id',async(req,res)=>{
+  const id=req.params.id;
+  const username= req.query.username;
+  const query={username:username}
+  const updateDoc={ $pull: { AddCardBeneficiary: { id: id } }}
+  const result=await usersCollection.updateOne(query,updateDoc);
+  res.send(result)
+
+})
 
 // get beneficiary list -----------
 router.get("/beneficiaryList/:username", async (req,res)=>{

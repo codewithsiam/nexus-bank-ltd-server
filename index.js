@@ -7,14 +7,14 @@ var morgan = require("morgan");
 
 
 // socket io connect start
-const http=require('http')
+const http = require('http')
 
-const {Server}=require('socket.io')
+const { Server } = require('socket.io')
 
-const server=http.createServer(app)
-exports.io= new Server(server , {
-  cors:{
-      origin:"*"
+const server = http.createServer(app)
+exports.io = new Server(server, {
+  cors: {
+    origin: "*"
   }
 })
 
@@ -73,10 +73,13 @@ exports.loanCollection = client.db("nexusBankDB").collection("loans");
 exports.paymentCollection = client.db("nexusBankDB").collection("transactions");
 exports.userAccountCollection = client.db("nexusBankDB").collection("userAccounts");
 exports.optCollection = client.db("nexusBankDB").collection("otps");
+exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
+exports.creditCardCollection = client.db("nexusBankDB").collection("creditCardCollection")
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
 exports.careerCollection = client.db("nexusBankDB").collection("career")
 exports.jobApplicationCollection = client.db("nexusBankDB").collection("jobApplication")
+exports.customerCollection = client.db("nexusBankDB").collection("support")
 
 
 // Routes-------------------
@@ -91,9 +94,12 @@ const loanRoutes = require("./routes/loan")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
 const sendOtp = require("./routes/sendOtp")
+const customerSupport = require('./routes/customer')
+const creditCardRoute = require("./routes/credit-card")
 const blogs=require("./routes/blog")
 const career=require("./routes/career")
 const jobApplication=require("./routes/jobApplication")
+
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -106,9 +112,12 @@ app.use(moneyTransfer);
 app.use(userAccounts);
 app.use(profile);
 app.use(sendOtp);
+app.use(creditCardRoute);
 app.use(blogs)
 app.use(career)
 app.use(jobApplication)
+app.use(customerSupport)
+
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");

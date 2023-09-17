@@ -114,6 +114,30 @@ router.get("/approved-accounts", async (req, res) => {
   res.send(result);
 });
 
+router.get('/current-user-account', async (req, res) => {
+  const filter = 'Current Account'
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/deposit-user-account', async (req, res) => {
+  const filter = 'Deposit Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/saving-user-account', async (req, res) => {
+  const filter = 'Saving Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
+router.get('/student-user-account', async (req, res) => {
+  const filter = 'Student Account';
+  const result = await userAccountCollection.find({ account_type: filter }).toArray()
+  res.send(result)
+})
+
 // ----------------------------------------------------------------------//
 // ------------------------- account create/ update --------------------//
 // ----------------------------------------------------------------------//
@@ -276,9 +300,8 @@ router.patch("/status/:id", async (req, res) => {
 
         await sendEmail(email, subject, htmlText);
 
-        res.status(201).send(insertResult);
+        res.status(200).send({ success: true, message: "User created successfully", insertResult});
       } else {
-
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
 
@@ -306,7 +329,7 @@ router.patch("/status/:id", async (req, res) => {
           $set: {
             status: "approved",
             balance: 0,
-            accountNumber
+            accountNumber,
           },
         };
         await userAccountCollection.updateOne(
@@ -361,7 +384,7 @@ router.patch("/status/:id", async (req, res) => {
         `;
         await sendEmail(email, subject, htmlText);
 
-        res.send(result);
+        res.send({ success: true, message: "Account created successfully" , result});
       }
     } else {
       // Update the status in the userAccountCollection
@@ -399,15 +422,16 @@ router.put("/feedback/:id", async (req, res) => {
   res.send(result);
 });
 
-
 router.get("/myAccounts", async (req, res) => {
   const { nidNumber } = req.query;
   if (!nidNumber) {
     return res.send({ success: false, message: "Nid number not valid" });
   }
-  const accounts = await userAccountCollection.find({ nid_card_number: nidNumber }).toArray();
+  const accounts = await userAccountCollection
+    .find({ nid_card_number: nidNumber })
+    .toArray();
   return res.send(accounts);
-})
+});
 
 router.get("/user-accounts", async (req, res) => {
   const { email } = req.query;
@@ -447,14 +471,12 @@ router.post("/create-deposit-account", async (req, res) => {
   // console.log("426", interestRateAndMaturityValue)
 
   if (interestRateAndMaturityValue) {
-    
     const interestRate = interestRateAndMaturityValue.interestRate;
     const maturityValue = interestRateAndMaturityValue.maturityValue;
     account.interestRate = interestRate;
     account.maturityValue = maturityValue;
     const result = await userAccountCollection.insertOne(account);
     res.send(result);
-
   } else {
     res.json({
       message: "Data not found for the selected amount and years.",

@@ -1,53 +1,46 @@
 const express = require('express');
 const router = express.Router();
+const { ObjectId } = require("mongodb");
 
 
 const { userAccountCollection , usersCollection} = require('../index');
 
 // .........update user profile data............
 
-router.patch("/update-Profile/:email", async (req, res) => {
+router.patch("/update-Profile/:id", async (req, res) => {
   try {
-    const email = req.params.email;
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
     const body = req.body;
-
-    // Validate the incoming data here
-
-    if (!body.nationality || !body.birthDate || !body.gender || !body.profession || !body.number || !body.description) {
-      return res.status(400).json({ error: 'All fields are required' });
+    const userInfo = await usersCollection.findOne(query);
+    
+    if (!userInfo) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    // Ensure you have connected to the MongoDB database
-    await client.connect();
-
-    const usersCollection = client.db('your-database-name').collection('users');
-
-    const filter = { email: email };
-    const options = { upsert: true };
+    // const options = { upsert: true };
     const updateDoc = {
       $set: {
         nationality: body.nationality,
-        birthDate: body.birthDate,
+        birthday: body.birthday,
         gender: body.gender,
         profession: body.profession,
         number: body.number,
         description: body.description,
+        nickname: body.nickName,
+        presentAddress: body.presentAddress,
+        permanentAddress: body.permanentAddress
       },
     };
 
-    const result = await usersCollection.updateOne(filter, updateDoc, options);
+    const result = await usersCollection.updateOne(userInfo, updateDoc);
+    const updatedUser = await usersCollection.findOne(query);
 
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.status(200).json({ message: 'Profile updated successfully' });
-  } catch (error) {
+    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+  } 
+  catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    // Close the MongoDB client connection when done
-    client.close();
   }
 });
 
@@ -65,7 +58,5 @@ router.patch("/update-Profile/:email", async (req, res) => {
 //   user.password = newPassword;
 //   res.status(200).json({ message: 'Password changed successfully' });
 // });
-
-
 
 module.exports = router;
