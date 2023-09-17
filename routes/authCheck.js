@@ -65,12 +65,12 @@ router.post("/admin-login", async (req, res) => {
     console.log("Admin from DB:", admin);
 
     if (!admin) {
-      return res.status(401).json({ success: false, message: "Invalid admin credentials" });
+      return res.json({ success: false, message: "Invalid admin credentials" });
     }
 
 
     if (!admin.password) {
-      return res.status(401).json({ success: false, message: "Password not found for admin" });
+      return res.json({ success: false, message: "Password not found" });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, admin.password);
@@ -92,7 +92,7 @@ router.post("/admin-login", async (req, res) => {
         token: token,
       });
     } else {
-      return res.status(401).json({
+      return res.json({
         success: false,
         message: "Passwords do not match",
       });

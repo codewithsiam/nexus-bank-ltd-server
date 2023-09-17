@@ -5,7 +5,7 @@ const router = express.Router();
 const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
 const { sendEmail } = require('../Modules/emailSend');
 
-router.put('/money-transfer', async (req, res) => {
+router.put('/money-payments', async (req, res) => {
     try {
         const data = req.body;
         console.log('Request Data:', data);
