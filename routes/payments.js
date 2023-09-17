@@ -45,13 +45,44 @@ router.post("/payments", async (req, res) => {
         //   console.log("hit success");
         const payment = req.body;
         // Find user and update balance
-        const user = await usersCollection.findOne({ email: payment.userEmail });
+        const user = await userAccountCollection.findOne({ accountNumber: payment.accountNumber });
         if (user) {
             if (!user.balance) {
                 user.balance = 0;
             }
             user.balance += payment.amount;
-            await usersCollection.updateOne({ email: payment.userEmail }, { $set: user });
+            await userAccountCollection.updateOne({ accountNumber: payment.accountNumber }, { $set: user });
+            const senderSubject = `You Added Money To Your ACCOUNT: ${payment.accountNumber} From Stripe Account`;
+            const senderHtmlText = `
+            <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Money Sent</title>
+    </head>
+    <body>
+        <h1>Money Added Successfully</h1>
+        <p>Hello ${user.last_name},</p>
+        <p>You have successfully add money in your account: ${payment.accountNumber} with the following details:</p>
+        
+        <ul>
+            <li>Amount: ${parseFloat(payment.amount)}</li>
+            <li>Date: ${payment.date} </li>
+            <li>Transaction ID: ${payment.transactionId}</li>
+            <li>Account Number:  ${payment.accountNumber}</li>
+            
+        </ul>
+    
+        <p>Thank you for using our services.</p>
+    
+        <p>Best regards,</p>
+        <p>Nexus Bank LTD</p>
+    </body>
+    </html>
+    
+            `
+            sendEmail(user.email, senderSubject, senderHtmlText)
         } else {
             console.log("User not found");
         }

@@ -31,7 +31,7 @@ router.patch("/update-Profile/:id", async (req, res) => {
         description: body.description,
         present_address: body.present_address,
         permanent_address: body.permanent_address,
-        img: body.img
+        profile_image: body.img
       },
     };
 

@@ -183,6 +183,7 @@ router.patch("/status/:id", async (req, res) => {
     const permanent_address = accountInfo?.permanent_address;
     const date_of_birth = accountInfo?.date_of_birth;
     const primaryEmail = accountInfo?.email;
+    const profile_image = accountInfo?.profile_image;
 
     let updateDoc = {
       $set: {
@@ -226,7 +227,7 @@ router.patch("/status/:id", async (req, res) => {
           date_of_birth,
           primaryEmail,
           permanent_address,
-
+          profile_image,
 
           accounts: [
             {
