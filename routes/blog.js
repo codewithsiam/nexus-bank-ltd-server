@@ -11,11 +11,11 @@ router.post('/addBlogs',async(req,res)=>{
    res.send(result)
 })
 
- router.get('/getBlogs',async(req,res)=>{
+router.get('/getBlogs',async(req,res)=>{
     const result= await blogsCollection.find().toArray()
     res.send(result)
-
 })
+
 router.delete("/deleteNews",async(req,res)=>{
 console.log(req.body.id)
 const id=req.body.id;

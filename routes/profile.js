@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 
-
-const { userAccountCollection , usersCollection} = require('../index');
+const {usersCollection, reviewCollection} = require('../index');
 
 // .........update user profile data............
 router.patch("/update-Profile/:id", async (req, res) => {
@@ -17,11 +16,10 @@ router.patch("/update-Profile/:id", async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // const options = { upsert: true };
     const updateDoc = {
       $set: {
-        nick_name: body.nick_name,
-        name: body.name,
+        last_name: body.last_name,
+        first_name: body.first_name,
         profession: body.profession,
         email: body.email,
         birthday: body.birthday,
@@ -31,7 +29,7 @@ router.patch("/update-Profile/:id", async (req, res) => {
         description: body.description,
         present_address: body.present_address,
         permanent_address: body.permanent_address,
-        img: body.img
+        profile_image: body.profile_image
       },
     };
 
@@ -44,6 +42,32 @@ router.patch("/update-Profile/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// .............give feedback about bank...........
+router.post("/user-reviews", async (req, res) => {
+  const review = req.body;
+  console.log(review);
+  const query = { email: review?.email };
+
+  const existingReview = await reviewCollection.findOne(query);
+  if (existingReview) {
+    return res.send({ message: "User already submitted a review" });
+  }
+
+  const result = await reviewCollection.insertOne(review);
+  res.send(result);
+});
+
+router.get("/user-reviews", async (req, res) => {
+  const result = await reviewCollection.find().toArray();
+  res.send(result);
+});
+
+// .............show feedback in testimonial part...........
+router.get("/user-feedback", async (req, res) => {
+  const result = await reviewCollection.find().toArray();
+  res.send(result);
 });
 
 module.exports = router;
