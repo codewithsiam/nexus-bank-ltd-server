@@ -37,13 +37,18 @@ router.get("/employees/:searchItem", async (req, res) => {
 
 // employee filter by designation
 router.get("/employeess/:filterItem", async (req, res) => {
-  const designation = req.params.filterItem;
-  if (!designation) {
-    return res.status(400).json({ error: "designation is required" });
+  const filterItem = req.params.filterItem;
+
+  if (filterItem === "All") {
+    // If the filterItem is "all," return all employees
+    const allEmployees = await employeeCollection.find({}).toArray();
+    res.send(allEmployees);
+  } else {
+    // If a specific designation is provided, filter by that designation
+    const query = { designation: filterItem };
+    const result = await employeeCollection.find(query).toArray();
+    res.send(result);
   }
-  const query = { designation: designation };
-  const result = await employeeCollection.find(query).toArray();
-  res.send(result);
 });
 
 router.post("/add-employee", async (req, res) => {
