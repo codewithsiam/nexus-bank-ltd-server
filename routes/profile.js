@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 
-const {usersCollection, reviewCollection} = require('../index');
+const {usersCollection, reviewCollection, bannerCollection} = require('../index');
 
 // .........update user profile data............
 router.patch("/update-Profile/:id", async (req, res) => {
@@ -44,7 +44,7 @@ router.patch("/update-Profile/:id", async (req, res) => {
   }
 });
 
-// .............give feedback about bank...........
+// .............post feedback about bank...........
 router.post("/user-reviews", async (req, res) => {
   const review = req.body;
   console.log(review);
@@ -59,14 +59,23 @@ router.post("/user-reviews", async (req, res) => {
   res.send(result);
 });
 
+// .............get feedback in testimonial section...........
 router.get("/user-reviews", async (req, res) => {
   const result = await reviewCollection.find().toArray();
   res.send(result);
 });
 
-// .............show feedback in testimonial part...........
-router.get("/user-feedback", async (req, res) => {
-  const result = await reviewCollection.find().toArray();
+// .............get banner...........
+router.get("/get-banner", async (req, res) => {
+  const result = await bannerCollection.find().toArray();
+  res.send(result);
+});
+// .............post banner...........
+router.post("/add-banner", async (req, res) => {
+  const banner = req.body;
+  console.log(banner);
+
+  const result = await bannerCollection.insertOne(banner);
   res.send(result);
 });
 
