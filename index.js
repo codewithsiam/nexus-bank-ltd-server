@@ -90,7 +90,7 @@ const router = require("./routes/chat");
 const { connect } = require("http2");
 const authCheckRoutes = require("./routes/authCheck");
 const userAccounts = require("./routes/userAccounts")
-const loanRoutes = require("./routes/loan")
+const loans = require("./routes/loans")
 const moneyTransfer = require("./routes/moneyTransfer")
 const profile = require("./routes/profile")
 const sendOtp = require("./routes/sendOtp")
@@ -107,7 +107,7 @@ app.use(userRoutes);
 app.use(paymentRoutes);
 app.use(router);
 app.use(authCheckRoutes);
-app.use(loanRoutes);
+app.use(loans);
 app.use(moneyTransfer);
 app.use(userAccounts);
 app.use(profile);
