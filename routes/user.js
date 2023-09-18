@@ -122,6 +122,27 @@ router.patch('/addcardbeneficiary',async (req,res)=>{
   res.send(result);
   
 })
+
+// handle beneficiary status 
+router.patch("/beneficiary-status/:name", async(req,res)=>{
+  const name = req.params.name;
+  const status = req.query.status;
+  const {username} = req.body;
+  const existingUser = await usersCollection.findOne({username:username});
+  if(existingUser){
+    const beneficiary = existingUser.beneficiaryList.find(beneficiary=>beneficiary.username === name);
+    if(beneficiary){
+      beneficiary.status = status;
+      const result = await usersCollection.updateOne({username:username},{$set:{beneficiaryList:existingUser.beneficiaryList}});
+      res.send(result);
+    }
+  }
+  else{
+    res.status(500).json({message:"something wrong"})
+  }
+  // console.log(name,status,username);
+})
+
 //get Card Beneficiary
 router.get('/CardBeneficiary',async(req,res)=>{
   const userName=req.query.useName;
