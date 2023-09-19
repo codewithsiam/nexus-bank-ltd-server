@@ -71,14 +71,6 @@ exports.userAccountCollection = client
   .collection("userAccounts");
 exports.optCollection = client.db("nexusBankDB").collection("otps");
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
-<<<<<<< HEAD
-exports.creditCardCollection = client
-  .db("nexusBankDB")
-  .collection("creditCardCollection");
-exports.depositPackage = client.db("nexusBankDB").collection("depositPackage");
-exports.blogsCollection = client.db("nexusBankDB").collection("blogs");
-exports.customerCollection = client.db("nexusBankDB").collection("support");
-=======
 exports.creditCardCollection = client.db("nexusBankDB").collection("creditCardCollection")
 exports.depositPackage = client.db("nexusBankDB").collection("depositPackage")
 exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
@@ -86,7 +78,6 @@ exports.careerCollection = client.db("nexusBankDB").collection("career")
 exports.jobApplicationCollection = client.db("nexusBankDB").collection("jobApplication")
 exports.customerCollection = client.db("nexusBankDB").collection("support")
 
->>>>>>> 2a21890200e21e158f94da57246e92cfac048415
 
 // Routes-------------------
 const employeeRoutes = require("./routes/employee");
@@ -95,16 +86,6 @@ const paymentRoutes = require("./routes/payments");
 const router = require("./routes/chat");
 const { connect } = require("http2");
 const authCheckRoutes = require("./routes/authCheck");
-<<<<<<< HEAD
-const userAccounts = require("./routes/userAccounts");
-const loanRoutes = require("./routes/loan");
-const moneyTransfer = require("./routes/moneyTransfer");
-const profile = require("./routes/profile");
-const sendOtp = require("./routes/sendOtp");
-const customerSupport = require("./routes/customer");
-const creditCardRoute = require("./routes/credit-card");
-const blogs = require("./routes/blog");
-=======
 const userAccounts = require("./routes/userAccounts")
 const loans = require("./routes/loans")
 const moneyTransfer = require("./routes/moneyTransfer")
@@ -116,7 +97,6 @@ const blogs=require("./routes/blog")
 const career=require("./routes/career")
 const jobApplication=require("./routes/jobApplication")
 
->>>>>>> 2a21890200e21e158f94da57246e92cfac048415
 
 // use middleware-------------------------
 app.use(employeeRoutes);
@@ -130,16 +110,11 @@ app.use(userAccounts);
 app.use(profile);
 app.use(sendOtp);
 app.use(creditCardRoute);
-<<<<<<< HEAD
-app.use(blogs);
-app.use(customerSupport);
-=======
 app.use(blogs)
 app.use(career)
 app.use(jobApplication)
 app.use(customerSupport)
 
->>>>>>> 2a21890200e21e158f94da57246e92cfac048415
 
 app.get("/", (req, res) => {
   res.send("Nexus Bank in Running");
