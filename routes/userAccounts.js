@@ -18,6 +18,13 @@ router.post("/add-account", async (req, res) => {
   res.send(result);
 });
 
+//
+router.delete("/deleteAccount/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await userAccountCollection.deleteOne(query);
+  res.send(result);
+});
 // get all pending accounts ----------
 router.get("/requested-accounts", async (req, res) => {
   const query = { status: "pending" };
@@ -114,29 +121,37 @@ router.get("/approved-accounts", async (req, res) => {
   res.send(result);
 });
 
-router.get('/current-user-account', async (req, res) => {
-  const filter = 'Current Account'
-  const result = await userAccountCollection.find({ account_type: filter }).toArray()
-  res.send(result)
-})
+router.get("/current-user-account", async (req, res) => {
+  const filter = "Current Account";
+  const result = await userAccountCollection
+    .find({ account_type: filter })
+    .toArray();
+  res.send(result);
+});
 
-router.get('/deposit-user-account', async (req, res) => {
-  const filter = 'Deposit Account';
-  const result = await userAccountCollection.find({ account_type: filter }).toArray()
-  res.send(result)
-})
+router.get("/deposit-user-account", async (req, res) => {
+  const filter = "Deposit Account";
+  const result = await userAccountCollection
+    .find({ account_type: filter })
+    .toArray();
+  res.send(result);
+});
 
-router.get('/saving-user-account', async (req, res) => {
-  const filter = 'Saving Account';
-  const result = await userAccountCollection.find({ account_type: filter }).toArray()
-  res.send(result)
-})
+router.get("/saving-user-account", async (req, res) => {
+  const filter = "Saving Account";
+  const result = await userAccountCollection
+    .find({ account_type: filter })
+    .toArray();
+  res.send(result);
+});
 
-router.get('/student-user-account', async (req, res) => {
-  const filter = 'Student Account';
-  const result = await userAccountCollection.find({ account_type: filter }).toArray()
-  res.send(result)
-})
+router.get("/student-user-account", async (req, res) => {
+  const filter = "Student Account";
+  const result = await userAccountCollection
+    .find({ account_type: filter })
+    .toArray();
+  res.send(result);
+});
 
 // ----------------------------------------------------------------------//
 // ------------------------- account create/ update --------------------//
@@ -222,8 +237,8 @@ router.patch("/status/:id", async (req, res) => {
           username: username,
           nid_card_number,
           status: "active",
-          password: hashedPassword, 
-          profileImage , 
+          password: hashedPassword,
+          profileImage,
           date_of_birth,
           primaryEmail,
           permanent_address,
@@ -301,7 +316,13 @@ router.patch("/status/:id", async (req, res) => {
 
         await sendEmail(email, subject, htmlText);
 
-        res.status(200).send({ success: true, message: "User created successfully", insertResult});
+        res
+          .status(200)
+          .send({
+            success: true,
+            message: "User created successfully",
+            insertResult,
+          });
       } else {
         const email = accountInfo.email;
         const phoneNumber = accountInfo.phone;
@@ -385,7 +406,11 @@ router.patch("/status/:id", async (req, res) => {
         `;
         await sendEmail(email, subject, htmlText);
 
-        res.send({ success: true, message: "Account created successfully" , result});
+        res.send({
+          success: true,
+          message: "Account created successfully",
+          result,
+        });
       }
     } else {
       // Update the status in the userAccountCollection
