@@ -77,6 +77,8 @@ exports.blogsCollection = client.db("nexusBankDB").collection("blogs")
 exports.careerCollection = client.db("nexusBankDB").collection("career")
 exports.jobApplicationCollection = client.db("nexusBankDB").collection("jobApplication")
 exports.customerCollection = client.db("nexusBankDB").collection("support")
+exports.reviewCollection = client.db("nexusBankDB").collection("reviews")
+exports.bannerCollection = client.db("nexusBankDB").collection("banners")
 
 
 // Routes-------------------

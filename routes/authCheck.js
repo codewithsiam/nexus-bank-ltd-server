@@ -105,10 +105,6 @@ router.post("/admin-login", async (req, res) => {
   }
 });
 
-
-
-
-
 // Profile route (protected with JWT authentication)
 router.get("/profileMonitor", verifyJWT, async (req, res) => {
   try {
