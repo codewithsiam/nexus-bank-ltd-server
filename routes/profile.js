@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 
-const {usersCollection, reviewCollection, bannerCollection} = require('../index');
+const {usersCollection, reviewCollection, bannerCollection, managementCollection} = require('../index');
 
 // .........update user profile data............
 router.patch("/update-Profile/:id", async (req, res) => {
@@ -76,6 +76,13 @@ router.post("/add-banner", async (req, res) => {
   console.log(banner);
 
   const result = await bannerCollection.insertOne(banner);
+  res.send(result);
+});
+
+
+// .............get management...........
+router.get("/get-management", async (req, res) => {
+  const result = await managementCollection.find().toArray();
   res.send(result);
 });
 
