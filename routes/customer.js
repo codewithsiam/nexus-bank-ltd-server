@@ -1,7 +1,6 @@
 const express = require("express");
 const { customerCollection } = require("../index");
 const router = express.Router();
-// const { ObjectId } = require("bson");
 const { ObjectId } = require("mongodb");
 
 router.post("/support-customers", async (req, res) => {
