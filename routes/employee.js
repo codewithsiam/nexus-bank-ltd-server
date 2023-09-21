@@ -121,25 +121,44 @@ router.post("/add-employee", async (req, res) => {
 });
 
 // delete employee -----------
-router.patch('/delete-employee/:id', async(req,res)=>{
+router.patch('/delete-employee/:id', async (req, res) => {
   const id = req.params.id;
-  const query = {_id: new ObjectId(id)};
+  console.log(id);
+  const query = { _id: new ObjectId(id) };
+  const employee = await employeeCollection.findOne(query);
+  if (!employee) {
+    return res.send({ success: false, message: "Employee not found" })
+  }
+  if (employee.designation == "Super Admin") {
+    return res.send({ success: false, message: "You can not delete Super Admin" });
+  }
+
+
   const result = await employeeCollection.deleteOne(query);
   res.send(result);
 });
 
 // employee designation change ------------------
-router.patch("/designation/:id", async(req,res)=>{
+router.patch("/designation/:id", async (req, res) => {
   const id = req.params.id;
   const designation = req.query.designation;
   console.log(designation)
-  const query = {_id: new ObjectId(id)};
+  const query = { _id: new ObjectId(id) };
+
+  const employee = await employeeCollection.findOne(query);
+  if (!employee) {
+    return res.send({ success: false, message: "Employee not found" })
+  }
+  if (employee.designation == "Super Admin") {
+    return res.send({ success: false, message: "You can not change the designation of Super Admin" });
+  }
+
   const updateDoc = {
-    $set:{
-      designation:designation
+    $set: {
+      designation: designation
     }
   }
-  const result = await employeeCollection.updateOne(query,updateDoc);
+  const result = await employeeCollection.updateOne(query, updateDoc);
   res.send(result);
 })
 
