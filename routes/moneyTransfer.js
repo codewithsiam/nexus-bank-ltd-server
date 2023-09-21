@@ -143,4 +143,28 @@ router.get('/money-transfer', async (req, res) => {
     res.send(result)
 })
 
+
+
+router.get('/cash-in', async (req, res) => {
+    const username = req.query.username;
+
+    const filter = {
+        username: username,
+        transactionType: "cash in" 
+    };
+
+    const result = await paymentCollection.find(filter).toArray();
+    res.send(result);
+});
+router.get('/transfer-history', async (req, res) => {
+    const username = req.query.username;
+
+    const filter = {
+        username: username,
+        transactionType: "transfer" 
+    };
+
+    const result = await paymentCollection.find(filter).toArray();
+    res.send(result);
+});
 module.exports = router;

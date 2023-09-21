@@ -1,19 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const { blogsCollection } = require("../index");
-const { ObjectId } = require("bson");
-
+const { ObjectId } = require('mongodb');
+//add blog
 router.post("/addBlogs", async (req, res) => {
   const data = req.body;
   console.log(data);
   const result = await blogsCollection.insertOne(data);
   res.send(result);
 });
-
+// get blog for user
 router.get("/getBlogs", async (req, res) => {
   const result = await blogsCollection.find().toArray();
   res.send(result);
 });
+//delete blog
 router.delete("/deleteNews", async (req, res) => {
   console.log(req.body.id);
   const id = req.body.id;
@@ -22,10 +23,10 @@ router.delete("/deleteNews", async (req, res) => {
   res.send(result);
 });
 
-router.get('/getBlogs',async(req,res)=>{
-    const result= await blogsCollection.find().toArray()
-    res.send(result)
-})
+// router.get('/getBlogs',async(req,res)=>{
+//     const result= await blogsCollection.find().toArray()
+//     res.send(result)
+// })
 
 router.delete("/deleteNews",async(req,res)=>{
 console.log(req.body.id)
