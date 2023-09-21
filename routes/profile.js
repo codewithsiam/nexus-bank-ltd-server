@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 
-const {usersCollection, reviewCollection, bannerCollection, managementCollection} = require('../index');
+const {usersCollection, reviewCollection, bannerCollection, directorsCollection} = require('../index');
 
 // .........update user profile data............
 router.patch("/update-Profile/:id", async (req, res) => {
@@ -80,9 +80,14 @@ router.post("/add-banner", async (req, res) => {
 });
 
 
-// .............get management...........
-router.get("/get-management", async (req, res) => {
-  const result = await managementCollection.find().toArray();
+// .............get directors...........
+router.get("/get-directors", async (req, res) => {
+  const result = await directorsCollection.find().toArray();
+  res.send(result);
+});
+// .............get directors...........
+router.get("/get-directors", async (req, res) => {
+  const result = await directorsCollection.find().toArray();
   res.send(result);
 });
 
