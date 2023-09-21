@@ -1,14 +1,16 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
-
-const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
 const { sendEmail } = require('../Modules/emailSend');
 
-router.put('/money-payments', async (req, res) => {
+const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
+
+router.put('/money-transfer', async (req, res) => {
     try {
+
         const data = req.body;
-        console.log('Request Data:', data);
+        const username = req.query.username;
+        console.log('Request Data:', username);
 
         // Sender account data
         const senderFilter = { accountNumber: data?.transferFromAccount };
@@ -56,7 +58,7 @@ router.put('/money-payments', async (req, res) => {
             transferAmount: parseFloat(data.transferAmount),
             transactionType: data.transactionType,
             reason: data?.reason,
-
+            username: username,
         };
 
         const transactionData = await paymentCollection.insertOne(transaction);
@@ -142,5 +144,30 @@ router.get('/money-transfer', async (req, res) => {
     const result = await paymentCollection.find({}).toArray();
     res.send(result)
 })
+
+router.get('/cash-in', async (req, res) => {
+    const username = req.query.username;
+
+    const filter = {
+        username: username,
+        transactionType: "cash in" 
+    };
+
+    const result = await paymentCollection.find(filter).toArray();
+    res.send(result);
+});
+router.get('/transfer-history', async (req, res) => {
+    const username = req.query.username;
+
+    const filter = {
+        username: username,
+        transactionType: "transfer" 
+    };
+
+    const result = await paymentCollection.find(filter).toArray();
+    res.send(result);
+});
+
+
 
 module.exports = router;
