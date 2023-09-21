@@ -1,14 +1,16 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
-
-const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
 const { sendEmail } = require('../Modules/emailSend');
 
-router.put('/money-payments', async (req, res) => {
+const { mongoClient, userAccountCollection, paymentCollection } = require('../index');
+
+router.put('/money-transfer', async (req, res) => {
     try {
+
         const data = req.body;
-        console.log('Request Data:', data);
+        const username = req.query.username;
+        console.log('Request Data:', username);
 
         // Sender account data
         const senderFilter = { accountNumber: data?.transferFromAccount };
@@ -56,7 +58,7 @@ router.put('/money-payments', async (req, res) => {
             transferAmount: parseFloat(data.transferAmount),
             transactionType: data.transactionType,
             reason: data?.reason,
-
+            username: username,
         };
 
         const transactionData = await paymentCollection.insertOne(transaction);
@@ -143,14 +145,12 @@ router.get('/money-transfer', async (req, res) => {
     res.send(result)
 })
 
-
-
 router.get('/cash-in', async (req, res) => {
     const username = req.query.username;
 
     const filter = {
         username: username,
-        transactionType: "cash in" 
+        transactionType: "cash in"
     };
 
     const result = await paymentCollection.find(filter).toArray();
@@ -161,10 +161,66 @@ router.get('/transfer-history', async (req, res) => {
 
     const filter = {
         username: username,
-        transactionType: "transfer" 
+        transactionType: "transfer"
     };
 
     const result = await paymentCollection.find(filter).toArray();
     res.send(result);
 });
+
+router.get('/transfer-history-info', async (req, res) => {
+    const username = req.query.username;
+
+    const pipeline = [
+        {
+            $match: {
+                username: username,
+                transactionType: "transfer"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalTransferAmount: { $sum: "$transferAmount" }
+            }
+        }
+    ];
+
+    const result = await paymentCollection.aggregate(pipeline).toArray();
+    if (result.length > 0) {
+        res.send({ totalTransferAmount: result[0].totalTransferAmount });
+    } else {
+        res.send({ totalTransferAmount: 0 }); 
+    }
+});
+
+
+router.get('/cash-in-history-info', async (req, res) => {
+    const username = req.query.username;
+    console.log(username);
+    const pipeline = [
+        {
+            $match: {
+                username: username,
+                transactionType: "cash in"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                amount: { $sum: "$amount" }
+            }
+        }
+    ];
+
+    const result = await paymentCollection.aggregate(pipeline).toArray();
+    if (result.length > 0) {
+        res.send({ amount: result[0].amount });
+    } else {
+        res.send({ amount: 0 }); 
+    }
+});
+
+
+
 module.exports = router;
